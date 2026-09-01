@@ -1,0 +1,2 @@
+.agents/skills/** -whitespace
+gradlew.bat text eol=crlf -whitespace

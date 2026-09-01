@@ -1,0 +1,6 @@
+<resources>
+    <string name="error_database_disk_full">The device does not have enough storage.</string>
+    <string name="error_database_not_found">The requested item was not found.</string>
+    <string name="error_database_unknown">The library could not be loaded.</string>
+    <string name="error_network_unknown">A network error occurred.</string>
+</resources>
