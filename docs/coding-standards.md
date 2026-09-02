@@ -8,6 +8,7 @@ Kotlin official style is the baseline. These project rules make architecture and
 | --- | --- | --- |
 | Kotlin package | Lowercase, no underscores | `com.nps.booknest.feature.library.data` |
 | Gradle module | Lowercase layer segments | `:feature:library:presentation` |
+| Presentation-only fixture feature | Omit empty domain/data modules until a real contract exists | `:feature:home:presentation` |
 | Multiword module | Kebab-case | `:core:design-system` |
 | Package structure | Match module and layer | `feature.library.presentation.list` |
 

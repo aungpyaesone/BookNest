@@ -55,6 +55,7 @@ kotlin {
         getByName("androidDeviceTest").dependencies {
             implementation(libs.androidx.test.runner)
             implementation(libs.androidx.testExt.junit)
+            implementation(libs.androidx.compose.ui.testManifest)
             implementation(libs.compose.material3.adaptiveNavigation3)
             implementation(libs.compose.uiTest)
         }

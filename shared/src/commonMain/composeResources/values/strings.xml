@@ -1,0 +1,9 @@
+<resources>
+    <string name="app_nav_home">ပင်မ</string>
+    <string name="app_nav_explore">ရှာဖွေ</string>
+    <string name="app_nav_library">စာကြည့်တိုက်</string>
+    <string name="app_nav_profile">ကိုယ်ရေး</string>
+    <string name="app_explore_title">စာအုပ်အသစ်များ ရှာဖွေပါ</string>
+    <string name="app_profile_title">သင့်ကိုယ်ရေးစာမျက်နှာ</string>
+    <string name="app_coming_soon_body">ဤနေရာကို လာမည့်အဆင့်တွင် ပိုမိုပြည့်စုံအောင် တည်ဆောက်ပါမည်။</string>
+</resources>

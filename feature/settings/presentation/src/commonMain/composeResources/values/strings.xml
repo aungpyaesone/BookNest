@@ -1,0 +1,13 @@
+<resources>
+    <string name="settings_title">ဆက်တင်များ</string>
+    <string name="settings_back_description">နောက်သို့ ပြန်မည်</string>
+    <string name="settings_appearance_title">အပြင်အဆင်</string>
+    <string name="settings_theme_title">အရောင်အသွင်</string>
+    <string name="settings_theme_description">BookNest အတွက် အသုံးပြုမည့် အရောင်အသွင်ကို ရွေးချယ်ပါ။</string>
+    <string name="settings_theme_light">အလင်း</string>
+    <string name="settings_theme_light_description">လက်ရှိ အဖြူရောင် အပြင်အဆင်ကို အသုံးပြုမည်</string>
+    <string name="settings_theme_dark">အမှောင်</string>
+    <string name="settings_theme_dark_description">အလင်းရောင်နည်းသော နေရာအတွက် အမှောင်အပြင်အဆင်ကို အသုံးပြုမည်</string>
+    <string name="settings_theme_system">စက်၏ ဆက်တင်အတိုင်း</string>
+    <string name="settings_theme_system_description">Android သို့မဟုတ် iOS အရောင်အသွင်ကို အလိုအလျောက်လိုက်မည်</string>
+</resources>

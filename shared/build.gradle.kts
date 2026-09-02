@@ -39,11 +39,18 @@ kotlin {
         commonMain.dependencies {
             implementation(project(":core:database"))
             implementation(project(":core:design-system"))
+            implementation(project(":core:settings"))
+            implementation(project(":feature:home:presentation"))
             implementation(project(":feature:library:data"))
             implementation(project(":feature:library:presentation"))
+            implementation(project(":feature:settings:presentation"))
+            implementation(libs.androidx.lifecycle.runtimeCompose)
+            implementation(libs.androidx.lifecycle.viewmodelCompose)
             implementation(libs.androidx.lifecycle.viewmodelNavigation3)
             implementation(libs.androidx.navigation3.ui)
+            implementation(libs.compose.components.resources)
             implementation(libs.compose.foundation)
+            implementation(libs.compose.material.iconsExtended)
             implementation(libs.compose.material3)
             implementation(libs.compose.material3.adaptive)
             implementation(libs.compose.material3.adaptiveNavigation3)
@@ -51,7 +58,9 @@ kotlin {
             implementation(libs.compose.ui)
             implementation(libs.compose.uiToolingPreview)
             implementation(libs.koin.compose)
+            implementation(libs.koin.compose.viewmodel)
             implementation(libs.koin.core)
+            implementation(libs.kotlinx.coroutines.core)
             implementation(libs.kotlinx.serialization.json)
         }
         androidMain.dependencies {
@@ -59,7 +68,15 @@ kotlin {
             implementation(libs.koin.android)
         }
         commonTest.dependencies {
+            implementation(libs.assertk)
             implementation(libs.kotlin.test)
+            implementation(libs.kotlinx.coroutines.test)
+        }
+        getByName("androidDeviceTest").dependencies {
+            implementation(libs.androidx.test.runner)
+            implementation(libs.androidx.testExt.junit)
+            implementation(libs.androidx.compose.ui.testManifest)
+            implementation(libs.compose.uiTest)
         }
     }
 }

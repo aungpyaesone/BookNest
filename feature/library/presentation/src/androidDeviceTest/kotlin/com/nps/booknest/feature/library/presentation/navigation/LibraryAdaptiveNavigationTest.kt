@@ -6,6 +6,7 @@
 package com.nps.booknest.feature.library.presentation.navigation
 
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.adaptive.layout.PaneScaffoldDirective
 import androidx.compose.material3.adaptive.navigation3.ListDetailSceneStrategy
 import androidx.compose.material3.adaptive.navigation3.rememberListDetailSceneStrategy
@@ -70,12 +71,22 @@ private fun LibraryNavigationTestContent(directive: PaneScaffoldDirective) {
                 entry<LibraryListKey>(
                     metadata = ListDetailSceneStrategy.listPane(),
                 ) {
-                    Box(modifier = Modifier.testTag(LIST_PANE_TAG))
+                    Box(
+                        modifier =
+                            Modifier
+                                .fillMaxSize()
+                                .testTag(LIST_PANE_TAG),
+                    )
                 }
                 entry<BookDetailKey>(
                     metadata = ListDetailSceneStrategy.detailPane(),
                 ) {
-                    Box(modifier = Modifier.testTag(DETAIL_PANE_TAG))
+                    Box(
+                        modifier =
+                            Modifier
+                                .fillMaxSize()
+                                .testTag(DETAIL_PANE_TAG),
+                    )
                 }
             },
     )

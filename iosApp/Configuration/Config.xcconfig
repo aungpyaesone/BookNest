@@ -1,4 +1,5 @@
 TEAM_ID=
+#include? "Local.xcconfig"
 
 PRODUCT_NAME=BookNest
 PRODUCT_BUNDLE_IDENTIFIER=com.nps.booknest.BookNest$(TEAM_ID)

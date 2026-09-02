@@ -22,8 +22,8 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.nps.booknest.core.designsystem.BookNestSpacing
 import com.nps.booknest.core.designsystem.BookNestTheme
 import com.nps.booknest.core.presentation.ObserveAsEvents
 import com.nps.booknest.core.presentation.asString
@@ -99,18 +99,18 @@ fun BookDetailScreen(
                         Modifier
                             .fillMaxSize()
                             .padding(contentPadding)
-                            .padding(32.dp),
+                            .padding(BookNestSpacing.section),
                     horizontalAlignment = Alignment.CenterHorizontally,
                     verticalArrangement = Arrangement.Center,
                 ) {
                     Text(
                         text = stringResource(Res.string.book_detail_missing),
                         color = MaterialTheme.colorScheme.onSurfaceVariant,
-                        style = MaterialTheme.typography.bodyLarge,
+                        style = MaterialTheme.typography.bodyMedium,
                     )
                     TextButton(
                         onClick = { onAction(BookDetailAction.OnRetryClick) },
-                        modifier = Modifier.padding(top = 8.dp),
+                        modifier = Modifier.padding(top = BookNestSpacing.small),
                     ) {
                         Text(text = stringResource(Res.string.library_retry))
                     }
@@ -136,7 +136,7 @@ private fun BookDetailContent(
         modifier =
             modifier
                 .fillMaxSize()
-                .padding(32.dp),
+                .padding(BookNestSpacing.section),
         verticalArrangement = Arrangement.Center,
     ) {
         Text(
@@ -146,15 +146,15 @@ private fun BookDetailContent(
         )
         Text(
             text = book.title,
-            modifier = Modifier.padding(top = 12.dp),
-            style = MaterialTheme.typography.headlineMedium,
+            modifier = Modifier.padding(top = BookNestSpacing.small),
+            style = MaterialTheme.typography.titleLarge,
             fontWeight = FontWeight.SemiBold,
         )
         Text(
             text = stringResource(Res.string.book_detail_author, book.author),
-            modifier = Modifier.padding(top = 8.dp),
+            modifier = Modifier.padding(top = BookNestSpacing.small),
             color = MaterialTheme.colorScheme.onSurfaceVariant,
-            style = MaterialTheme.typography.bodyLarge,
+            style = MaterialTheme.typography.bodyMedium,
         )
     }
 }
@@ -165,13 +165,13 @@ fun BookDetailPane(modifier: Modifier = Modifier) {
         modifier =
             modifier
                 .fillMaxSize()
-                .padding(32.dp),
+                .padding(BookNestSpacing.section),
         contentAlignment = Alignment.Center,
     ) {
         Text(
             text = stringResource(Res.string.book_detail_placeholder),
             color = MaterialTheme.colorScheme.onSurfaceVariant,
-            style = MaterialTheme.typography.bodyLarge,
+            style = MaterialTheme.typography.bodyMedium,
         )
     }
 }

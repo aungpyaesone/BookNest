@@ -58,6 +58,11 @@ val allowedProjectDependencies = mapOf(
     ":core:database" to setOf(":core:domain"),
     ":core:presentation" to setOf(":core:domain"),
     ":core:design-system" to emptySet(),
+    ":core:settings" to emptySet(),
+    ":feature:home:presentation" to setOf(
+        ":core:design-system",
+        ":core:presentation",
+    ),
     ":feature:library:domain" to setOf(":core:domain"),
     ":feature:library:data" to setOf(
         ":core:database",
@@ -70,14 +75,22 @@ val allowedProjectDependencies = mapOf(
         ":core:presentation",
         ":feature:library:domain",
     ),
+    ":feature:settings:presentation" to setOf(
+        ":core:design-system",
+        ":core:presentation",
+        ":core:settings",
+    ),
     ":shared" to setOf(
         ":core:database",
         ":core:design-system",
         ":core:domain",
         ":core:presentation",
+        ":core:settings",
+        ":feature:home:presentation",
         ":feature:library:data",
         ":feature:library:domain",
         ":feature:library:presentation",
+        ":feature:settings:presentation",
     ),
     ":androidApp" to setOf(":shared"),
 )
@@ -188,9 +201,16 @@ tasks.register("verifyBookNest") {
     dependsOn(tasks.check)
     dependsOn(gradle.includedBuild("build-logic").task(":test"))
     dependsOn(":core:domain:testAndroidHostTest")
+    dependsOn(":core:settings:testAndroidHostTest")
     dependsOn(":feature:library:data:testAndroidHostTest")
+    dependsOn(":feature:home:presentation:testAndroidHostTest")
+    dependsOn(":feature:home:presentation:assembleAndroidTest")
     dependsOn(":feature:library:presentation:testAndroidHostTest")
     dependsOn(":feature:library:presentation:assembleAndroidTest")
+    dependsOn(":feature:settings:presentation:testAndroidHostTest")
+    dependsOn(":feature:settings:presentation:assembleAndroidTest")
+    dependsOn(":shared:testAndroidHostTest")
+    dependsOn(":shared:assembleAndroidTest")
     dependsOn(":androidApp:assembleDebug")
     dependsOn(":shared:compileKotlinIosSimulatorArm64")
 }

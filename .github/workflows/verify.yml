@@ -24,7 +24,12 @@ jobs:
           api-level: 35
           arch: x86_64
           disable-animations: true
-          script: ./gradlew :feature:library:presentation:androidConnectedCheck --stacktrace
+          script: >-
+            ./gradlew
+            :feature:home:presentation:androidConnectedCheck
+            :feature:library:presentation:androidConnectedCheck
+            :shared:androidConnectedCheck
+            --stacktrace
       - name: Build iOS simulator application
         run: >-
           xcodebuild

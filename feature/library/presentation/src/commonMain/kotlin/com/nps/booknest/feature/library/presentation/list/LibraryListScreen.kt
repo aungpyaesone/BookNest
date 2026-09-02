@@ -27,8 +27,8 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.nps.booknest.core.designsystem.BookNestSpacing
 import com.nps.booknest.core.designsystem.BookNestTheme
 import com.nps.booknest.core.presentation.ObserveAsEvents
 import com.nps.booknest.core.presentation.asString
@@ -91,8 +91,8 @@ fun LibraryListScreen(
         ) {
             Text(
                 text = stringResource(Res.string.library_list_title),
-                modifier = Modifier.padding(horizontal = 24.dp, vertical = 20.dp),
-                style = MaterialTheme.typography.headlineMedium,
+                modifier = Modifier.padding(horizontal = BookNestSpacing.large, vertical = BookNestSpacing.large),
+                style = MaterialTheme.typography.titleLarge,
                 fontWeight = FontWeight.SemiBold,
             )
 
@@ -107,7 +107,7 @@ fun LibraryListScreen(
 
                 else -> {
                     LazyColumn(
-                        contentPadding = PaddingValues(bottom = 24.dp),
+                        contentPadding = PaddingValues(bottom = BookNestSpacing.extraLarge),
                     ) {
                         items(
                             items = state.books,
@@ -142,7 +142,7 @@ fun EmptyLibraryContent(modifier: Modifier = Modifier) {
         modifier =
             modifier
                 .fillMaxSize()
-                .padding(32.dp),
+                .padding(BookNestSpacing.section),
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center,
     ) {
@@ -152,9 +152,9 @@ fun EmptyLibraryContent(modifier: Modifier = Modifier) {
         )
         Text(
             text = stringResource(Res.string.library_empty_message),
-            modifier = Modifier.padding(top = 8.dp),
+            modifier = Modifier.padding(top = BookNestSpacing.small),
             color = MaterialTheme.colorScheme.onSurfaceVariant,
-            style = MaterialTheme.typography.bodyLarge,
+            style = MaterialTheme.typography.bodyMedium,
         )
     }
 }
@@ -170,7 +170,7 @@ fun BookListItem(
             modifier
                 .fillMaxWidth()
                 .clickable(onClick = onClick)
-                .padding(horizontal = 24.dp, vertical = 18.dp),
+                .padding(horizontal = BookNestSpacing.large, vertical = BookNestSpacing.medium),
     ) {
         Text(
             text = book.title,
@@ -179,9 +179,9 @@ fun BookListItem(
         )
         Text(
             text = book.author,
-            modifier = Modifier.padding(top = 4.dp),
+            modifier = Modifier.padding(top = BookNestSpacing.extraSmall),
             color = MaterialTheme.colorScheme.onSurfaceVariant,
-            style = MaterialTheme.typography.bodyMedium,
+            style = MaterialTheme.typography.bodySmall,
         )
     }
 }
