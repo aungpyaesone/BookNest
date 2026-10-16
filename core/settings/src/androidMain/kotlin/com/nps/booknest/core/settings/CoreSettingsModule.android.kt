@@ -8,9 +8,9 @@ import org.koin.dsl.module
 
 private const val PREFERENCES_FILE_NAME = "booknest_preferences"
 
-private class AndroidThemeSettingsStorage(
+private class AndroidSettingsStorage(
     context: Context,
-) : ThemeSettingsStorage {
+) : SettingsStorage {
     private val preferences = context.getSharedPreferences(PREFERENCES_FILE_NAME, Context.MODE_PRIVATE)
 
     override fun readString(key: String): String? = preferences.getString(key, null)
@@ -25,6 +25,7 @@ private class AndroidThemeSettingsStorage(
 
 actual val coreSettingsModule =
     module {
-        single<ThemeSettingsStorage> { AndroidThemeSettingsStorage(androidContext()) }
+        single<SettingsStorage> { AndroidSettingsStorage(androidContext()) }
         singleOf(::DefaultThemeLocalDataSource) bind ThemeLocalDataSource::class
+        singleOf(::DefaultReaderPreferencesLocalDataSource) bind ReaderPreferencesLocalDataSource::class
     }

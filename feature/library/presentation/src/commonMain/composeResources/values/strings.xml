@@ -3,6 +3,7 @@
     <string name="book_detail_missing">This book is no longer in your library.</string>
     <string name="book_detail_placeholder">Select a book to see its details.</string>
     <string name="book_detail_title">Book details</string>
+    <string name="book_detail_read">ဖတ်မည်</string>
     <string name="library_empty_message">Saved books will appear here.</string>
     <string name="library_empty_title">Your library is empty</string>
     <string name="library_list_title">Library</string>

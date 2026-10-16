@@ -1,0 +1,20 @@
+<resources>
+    <string name="reader_back_description">နောက်သို့ ပြန်မည်</string>
+    <string name="reader_chapters_description">အခန်းစာရင်း ဖွင့်မည်</string>
+    <string name="reader_settings_description">စာဖတ်ခြင်း ဆက်တင်များ</string>
+    <string name="reader_previous_chapter">ယခင်အခန်း</string>
+    <string name="reader_next_chapter">နောက်အခန်း</string>
+    <string name="reader_chapters_title">အခန်းများ</string>
+    <string name="reader_appearance_title">စာဖတ်မျက်နှာပြင်</string>
+    <string name="reader_font_size">စာလုံးအရွယ်</string>
+    <string name="reader_decrease_font_description">စာလုံးအရွယ် လျှော့မည်</string>
+    <string name="reader_increase_font_description">စာလုံးအရွယ် တိုးမည်</string>
+    <string name="reader_theme">နောက်ခံအရောင်</string>
+    <string name="reader_theme_light">အလင်း</string>
+    <string name="reader_theme_sepia">စီပီယာ</string>
+    <string name="reader_theme_dark">အမှောင်</string>
+    <string name="reader_loading">စာအုပ်ကို ဖွင့်နေသည်</string>
+    <string name="reader_missing">ဤစာအုပ်၏ ဖတ်ရှုရန်အကြောင်းအရာကို မတွေ့ပါ</string>
+    <string name="reader_progress_description">ဖတ်ရှုပြီး %1$d ရာခိုင်နှုန်း</string>
+    <string name="reader_progress_save_error">ဖတ်ရှုနေရာကို မသိမ်းနိုင်ပါ</string>
+</resources>

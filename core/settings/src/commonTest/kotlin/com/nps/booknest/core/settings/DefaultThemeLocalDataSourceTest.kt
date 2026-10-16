@@ -34,7 +34,7 @@ class DefaultThemeLocalDataSourceTest {
 
 private class FakeThemeSettingsStorage(
     initialValue: String? = null,
-) : ThemeSettingsStorage {
+) : SettingsStorage {
     var value: String? = initialValue
         private set
 

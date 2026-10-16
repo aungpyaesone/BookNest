@@ -5,7 +5,7 @@ import org.koin.dsl.bind
 import org.koin.dsl.module
 import platform.Foundation.NSUserDefaults
 
-private class IosThemeSettingsStorage : ThemeSettingsStorage {
+private class IosSettingsStorage : SettingsStorage {
     private val userDefaults = NSUserDefaults.standardUserDefaults
 
     override fun readString(key: String): String? = userDefaults.stringForKey(key)
@@ -20,6 +20,7 @@ private class IosThemeSettingsStorage : ThemeSettingsStorage {
 
 actual val coreSettingsModule =
     module {
-        singleOf(::IosThemeSettingsStorage) bind ThemeSettingsStorage::class
+        singleOf(::IosSettingsStorage) bind SettingsStorage::class
         singleOf(::DefaultThemeLocalDataSource) bind ThemeLocalDataSource::class
+        singleOf(::DefaultReaderPreferencesLocalDataSource) bind ReaderPreferencesLocalDataSource::class
     }

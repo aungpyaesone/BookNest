@@ -8,6 +8,7 @@ Describe the user-visible and architectural change.
 - [ ] Code is in the correct module and no forbidden dependency was introduced.
 - [ ] Tests cover the changed behavior and error paths.
 - [ ] Compact and expanded adaptive behavior was verified when UI changed.
+- [ ] Reader changes preserve progress restore, accessible controls, and hidden app navigation chrome.
 - [ ] GitNexus impact analysis was run before editing existing symbols.
 - [ ] GitNexus index was refreshed and `detect-changes --scope all` was reviewed.
 - [ ] `./gradlew verifyBookNest` passes locally.

@@ -20,6 +20,8 @@ class HomeViewModel : ViewModel() {
     private val eventChannel = Channel<HomeEvent>(capacity = Channel.BUFFERED)
     val events = eventChannel.receiveAsFlow()
 
+    // Exhaustive MVI dispatch keeps every HomeAction explicit and type-safe in one composition entry point.
+    @Suppress("CyclomaticComplexMethod")
     fun onAction(action: HomeAction) {
         when (action) {
             is HomeAction.OnSearchQueryChange -> updateFilters { copy(searchQuery = action.query) }
@@ -44,9 +46,11 @@ class HomeViewModel : ViewModel() {
 
             HomeAction.OnSettingsClick -> sendEvent(HomeEvent.NavigateToSettings)
 
+            is HomeAction.OnReadNowClick -> sendEvent(HomeEvent.NavigateToReader(action.bookId))
+
             HomeAction.OnNotificationClick -> showMessage(Res.string.home_message_notifications_empty)
 
-            HomeAction.OnReadNowClick,
+            HomeAction.OnUpgradeClick,
             is HomeAction.OnBookClick,
             is HomeAction.OnBuyClick,
             is HomeAction.OnRentClick,

@@ -26,8 +26,10 @@ jobs:
           disable-animations: true
           script: >-
             ./gradlew
+            :core:database:androidConnectedCheck
             :feature:home:presentation:androidConnectedCheck
             :feature:library:presentation:androidConnectedCheck
+            :feature:reader:presentation:androidConnectedCheck
             :shared:androidConnectedCheck
             --stacktrace
       - name: Build iOS simulator application

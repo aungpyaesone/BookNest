@@ -20,6 +20,9 @@ kotlin {
                 .get()
                 .toInt()
         compilerOptions { jvmTarget = JvmTarget.JVM_11 }
+        withDeviceTest {
+            instrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
+        }
         withHostTest {}
     }
 
@@ -33,6 +36,10 @@ kotlin {
         }
         androidMain.dependencies {
             implementation(libs.koin.android)
+        }
+        getByName("androidDeviceTest").dependencies {
+            implementation(libs.androidx.test.runner)
+            implementation(libs.androidx.testExt.junit)
         }
         commonTest.dependencies {
             implementation(libs.kotlin.test)

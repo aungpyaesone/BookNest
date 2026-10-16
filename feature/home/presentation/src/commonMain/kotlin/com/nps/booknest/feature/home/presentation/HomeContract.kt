@@ -105,7 +105,11 @@ sealed interface HomeAction {
 
     data object OnSettingsClick : HomeAction
 
-    data object OnReadNowClick : HomeAction
+    data class OnReadNowClick(
+        val bookId: String,
+    ) : HomeAction
+
+    data object OnUpgradeClick : HomeAction
 }
 
 sealed interface HomeEvent {
@@ -114,6 +118,10 @@ sealed interface HomeEvent {
     data object NavigateToLibrary : HomeEvent
 
     data object NavigateToSettings : HomeEvent
+
+    data class NavigateToReader(
+        val bookId: String,
+    ) : HomeEvent
 
     data class ShowSnackbar(
         val message: UiText,

@@ -19,4 +19,5 @@ actual val coreDatabaseModule =
     module {
         single { createBookNestDatabase(getDatabaseBuilder(androidContext())) }
         single { get<BookNestDatabase>().bookDao() }
+        single { get<BookNestDatabase>().readingProgressDao() }
     }

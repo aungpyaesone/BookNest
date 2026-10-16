@@ -126,6 +126,25 @@ class BookNestAppScaffoldTest {
             onNodeWithTag(AppNavigationTestTags.NAVIGATION_RAIL).assertDoesNotExist()
         }
 
+    @Test
+    fun readerHidesBottomNavigationAndRail() =
+        runComposeUiTest {
+            setContent {
+                BookNestTheme {
+                    BookNestAppScaffold(
+                        selectedDestination = AppDestination.HOME,
+                        onDestinationSelect = {},
+                        isReaderVisible = true,
+                    ) {
+                        Box(modifier = Modifier)
+                    }
+                }
+            }
+
+            onNodeWithTag(AppNavigationTestTags.BOTTOM_BAR).assertDoesNotExist()
+            onNodeWithTag(AppNavigationTestTags.NAVIGATION_RAIL).assertDoesNotExist()
+        }
+
     private fun verifyExpandedAppShellBackground(
         isDarkTheme: Boolean,
         expectedColor: Color,

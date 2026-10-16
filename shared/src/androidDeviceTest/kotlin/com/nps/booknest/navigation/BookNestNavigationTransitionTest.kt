@@ -59,7 +59,8 @@ class BookNestNavigationTransitionTest {
                 backStack.clear()
                 backStack.add(SecondKey)
             }
-            mainClock.advanceTimeByFrame()
+            // Allow scene calculation and AnimatedContent layout before inspecting the overlap.
+            mainClock.advanceTimeBy(64)
 
             onNodeWithTag(FIRST_DESTINATION_TAG).assertExists()
             onNodeWithTag(SECOND_DESTINATION_TAG).assertExists()

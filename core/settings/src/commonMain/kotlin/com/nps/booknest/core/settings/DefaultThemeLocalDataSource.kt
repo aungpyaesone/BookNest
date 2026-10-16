@@ -6,7 +6,7 @@ import kotlinx.coroutines.flow.update
 
 internal const val THEME_MODE_KEY = "booknest_theme_mode"
 
-internal interface ThemeSettingsStorage {
+internal interface SettingsStorage {
     fun readString(key: String): String?
 
     fun writeString(
@@ -16,7 +16,7 @@ internal interface ThemeSettingsStorage {
 }
 
 internal class DefaultThemeLocalDataSource(
-    private val storage: ThemeSettingsStorage,
+    private val storage: SettingsStorage,
 ) : ThemeLocalDataSource {
     private val mutableThemeMode =
         MutableStateFlow(

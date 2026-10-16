@@ -7,18 +7,19 @@ import androidx.room.RoomDatabaseConstructor
 import androidx.sqlite.driver.bundled.BundledSQLiteDriver
 import com.nps.booknest.core.database.book.BookDao
 import com.nps.booknest.core.database.book.BookEntity
+import com.nps.booknest.core.database.reading.ReadingProgressDao
+import com.nps.booknest.core.database.reading.ReadingProgressEntity
 import kotlinx.coroutines.Dispatchers
 import org.koin.core.module.Module
 
 internal const val BOOKNEST_DATABASE_NAME = "booknest.db"
 
-@Database(
-    entities = [BookEntity::class],
-    version = 1,
-)
+@Database(entities = [BookEntity::class, ReadingProgressEntity::class], version = 2)
 @ConstructedBy(BookNestDatabaseConstructor::class)
 abstract class BookNestDatabase : RoomDatabase() {
     abstract fun bookDao(): BookDao
+
+    abstract fun readingProgressDao(): ReadingProgressDao
 }
 
 @Suppress("KotlinNoActualForExpect")
@@ -28,6 +29,8 @@ expect object BookNestDatabaseConstructor : RoomDatabaseConstructor<BookNestData
 
 fun createBookNestDatabase(builder: RoomDatabase.Builder<BookNestDatabase>): BookNestDatabase =
     builder
+        .addCallback(DemoBookDatabaseCallback)
+        .addMigrations(Migration1To2)
         .setDriver(BundledSQLiteDriver())
         .setQueryCoroutineContext(Dispatchers.Default)
         .build()

@@ -30,4 +30,5 @@ actual val coreDatabaseModule =
     module {
         single { createBookNestDatabase(getDatabaseBuilder()) }
         single { get<BookNestDatabase>().bookDao() }
+        single { get<BookNestDatabase>().readingProgressDao() }
     }

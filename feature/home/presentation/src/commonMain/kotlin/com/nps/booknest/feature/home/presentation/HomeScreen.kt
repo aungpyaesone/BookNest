@@ -99,6 +99,7 @@ fun HomeRoot(
     onNavigateToExplore: () -> Unit,
     onNavigateToLibrary: () -> Unit,
     onNavigateToSettings: () -> Unit,
+    onNavigateToReader: (String) -> Unit,
     modifier: Modifier = Modifier,
     viewModel: HomeViewModel = koinViewModel(),
 ) {
@@ -112,6 +113,7 @@ fun HomeRoot(
             HomeEvent.NavigateToExplore -> onNavigateToExplore()
             HomeEvent.NavigateToLibrary -> onNavigateToLibrary()
             HomeEvent.NavigateToSettings -> onNavigateToSettings()
+            is HomeEvent.NavigateToReader -> onNavigateToReader(event.bookId)
             is HomeEvent.ShowSnackbar -> pendingSnackbar = event.message
         }
     }
@@ -192,7 +194,7 @@ private fun CompactHomeFeed(
         item { ContinueReadingCard(state.continueReading, onAction, HomeLayoutMode.COMPACT) }
         item {
             PremiumBanner(
-                onUpgradeClick = { onAction(HomeAction.OnReadNowClick) },
+                onUpgradeClick = { onAction(HomeAction.OnUpgradeClick) },
                 layoutMode = HomeLayoutMode.COMPACT,
             )
         }
@@ -238,7 +240,7 @@ private fun AdaptiveHomeFeed(
                     Column(verticalArrangement = Arrangement.spacedBy(BookNestSpacing.extraLarge)) {
                         ContinueReadingCard(state.continueReading, onAction, layoutMode)
                         PremiumBanner(
-                            onUpgradeClick = { onAction(HomeAction.OnReadNowClick) },
+                            onUpgradeClick = { onAction(HomeAction.OnUpgradeClick) },
                             layoutMode = layoutMode,
                         )
                     }
@@ -251,7 +253,7 @@ private fun AdaptiveHomeFeed(
                             Modifier.weight(1.5f),
                         )
                         PremiumBanner(
-                            onUpgradeClick = { onAction(HomeAction.OnReadNowClick) },
+                            onUpgradeClick = { onAction(HomeAction.OnUpgradeClick) },
                             layoutMode = layoutMode,
                             modifier = Modifier.weight(1f),
                         )

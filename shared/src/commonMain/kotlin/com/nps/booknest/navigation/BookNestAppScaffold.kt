@@ -42,6 +42,8 @@ import com.nps.booknest.shared.generated.resources.app_nav_profile
 import org.jetbrains.compose.resources.StringResource
 import org.jetbrains.compose.resources.stringResource
 
+// The shell keeps its independent navigation, adaptive-layout, and chrome states explicit at the composition boundary.
+@Suppress("LongParameterList")
 @Composable
 fun BookNestAppScaffold(
     selectedDestination: AppDestination,
@@ -49,6 +51,7 @@ fun BookNestAppScaffold(
     modifier: Modifier = Modifier,
     forceExpanded: Boolean? = null,
     isSettingsVisible: Boolean = false,
+    isReaderVisible: Boolean = false,
     allowSelectedDestinationClick: Boolean = false,
     content: @Composable () -> Unit,
 ) {
@@ -64,7 +67,9 @@ fun BookNestAppScaffold(
     ) {
         val isExpanded = forceExpanded ?: (maxWidth >= 840.dp)
         val shouldShowBottomNavigation = !(isSettingsVisible && maxHeight > maxWidth)
-        if (isExpanded) {
+        if (isReaderVisible) {
+            Box(modifier = Modifier.fillMaxSize()) { movableContent() }
+        } else if (isExpanded) {
             Row(modifier = Modifier.fillMaxSize().windowInsetsPadding(WindowInsets.safeDrawing)) {
                 BookNestNavigationRail(
                     selectedDestination = selectedDestination,

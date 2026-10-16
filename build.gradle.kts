@@ -75,6 +75,19 @@ val allowedProjectDependencies = mapOf(
         ":core:presentation",
         ":feature:library:domain",
     ),
+    ":feature:reader:domain" to setOf(":core:domain"),
+    ":feature:reader:data" to setOf(
+        ":core:database",
+        ":core:domain",
+        ":feature:reader:domain",
+    ),
+    ":feature:reader:presentation" to setOf(
+        ":core:design-system",
+        ":core:domain",
+        ":core:presentation",
+        ":core:settings",
+        ":feature:reader:domain",
+    ),
     ":feature:settings:presentation" to setOf(
         ":core:design-system",
         ":core:presentation",
@@ -90,6 +103,9 @@ val allowedProjectDependencies = mapOf(
         ":feature:library:data",
         ":feature:library:domain",
         ":feature:library:presentation",
+        ":feature:reader:data",
+        ":feature:reader:domain",
+        ":feature:reader:presentation",
         ":feature:settings:presentation",
     ),
     ":androidApp" to setOf(":shared"),
@@ -122,7 +138,11 @@ val architectureCheck by tasks.registering {
             "org.koin.",
             "platform.",
         )
-        listOf(project(":core:domain"), project(":feature:library:domain")).forEach { domainProject ->
+        listOf(
+            project(":core:domain"),
+            project(":feature:library:domain"),
+            project(":feature:reader:domain"),
+        ).forEach { domainProject ->
             domainProject.fileTree("src") { include("**/*.kt") }.forEach { sourceFile ->
                 val source = sourceFile.readText()
                 forbiddenDomainImports.forEach { forbiddenImport ->
@@ -201,12 +221,17 @@ tasks.register("verifyBookNest") {
     dependsOn(tasks.check)
     dependsOn(gradle.includedBuild("build-logic").task(":test"))
     dependsOn(":core:domain:testAndroidHostTest")
+    dependsOn(":core:database:testAndroidHostTest")
+    dependsOn(":core:database:assembleAndroidTest")
     dependsOn(":core:settings:testAndroidHostTest")
     dependsOn(":feature:library:data:testAndroidHostTest")
     dependsOn(":feature:home:presentation:testAndroidHostTest")
     dependsOn(":feature:home:presentation:assembleAndroidTest")
     dependsOn(":feature:library:presentation:testAndroidHostTest")
     dependsOn(":feature:library:presentation:assembleAndroidTest")
+    dependsOn(":feature:reader:data:testAndroidHostTest")
+    dependsOn(":feature:reader:presentation:testAndroidHostTest")
+    dependsOn(":feature:reader:presentation:assembleAndroidTest")
     dependsOn(":feature:settings:presentation:testAndroidHostTest")
     dependsOn(":feature:settings:presentation:assembleAndroidTest")
     dependsOn(":shared:testAndroidHostTest")

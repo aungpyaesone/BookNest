@@ -1,5 +1,6 @@
 package com.nps.booknest.feature.library.presentation.detail
 
+import app.cash.turbine.test
 import assertk.assertThat
 import assertk.assertions.isEqualTo
 import com.nps.booknest.core.domain.Result
@@ -31,6 +32,27 @@ class BookDetailViewModelTest {
                 assertThat(viewModel.state.value).isEqualTo(
                     BookDetailState(isLoading = false, book = book),
                 )
+            } finally {
+                Dispatchers.resetMain()
+            }
+        }
+
+    @Test
+    fun `read click emits reader navigation with selected identifier`() =
+        runTest {
+            Dispatchers.setMain(StandardTestDispatcher(testScheduler))
+            try {
+                val viewModel =
+                    BookDetailViewModel(
+                        bookId = "mountain-morning",
+                        bookLocalDataSource = FakeBookLocalDataSource(),
+                    )
+                viewModel.events.test {
+                    viewModel.onAction(BookDetailAction.OnReadClick)
+                    runCurrent()
+
+                    assertThat(awaitItem()).isEqualTo(BookDetailEvent.NavigateToReader("mountain-morning"))
+                }
             } finally {
                 Dispatchers.resetMain()
             }

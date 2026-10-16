@@ -9,11 +9,17 @@ import androidx.compose.animation.fadeOut
 import androidx.compose.animation.scaleIn
 import androidx.compose.animation.scaleOut
 import androidx.compose.animation.togetherWith
+import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.adaptive.ExperimentalMaterial3AdaptiveApi
 import androidx.compose.material3.adaptive.navigation3.ListDetailSceneStrategy
 import androidx.compose.material3.adaptive.navigation3.rememberListDetailSceneStrategy
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
+import androidx.navigation3.runtime.NavBackStack
 import androidx.navigation3.runtime.NavKey
 import androidx.navigation3.runtime.entryProvider
 import androidx.navigation3.runtime.rememberNavBackStack
@@ -28,6 +34,9 @@ import com.nps.booknest.feature.library.presentation.list.LibraryListRoot
 import com.nps.booknest.feature.library.presentation.navigation.BookDetailKey
 import com.nps.booknest.feature.library.presentation.navigation.LibraryListKey
 import com.nps.booknest.feature.library.presentation.navigation.libraryNavigationSerializers
+import com.nps.booknest.feature.reader.presentation.ReaderRoot
+import com.nps.booknest.feature.reader.presentation.navigation.ReaderKey
+import com.nps.booknest.feature.reader.presentation.navigation.readerNavigationSerializers
 import com.nps.booknest.feature.settings.presentation.SettingsRoot
 import kotlinx.serialization.modules.SerializersModule
 
@@ -41,34 +50,33 @@ private val navigationConfiguration =
                 include(appNavigationSerializers)
                 include(homeNavigationSerializers)
                 include(libraryNavigationSerializers)
+                include(readerNavigationSerializers)
             }
     }
 
 @OptIn(ExperimentalMaterial3AdaptiveApi::class)
 @Composable
-fun BookNestNavigation() {
+fun BookNestNavigation(modifier: Modifier = Modifier) {
     val backStack = rememberNavBackStack(navigationConfiguration, HomeKey)
     val listDetailSceneStrategy = rememberListDetailSceneStrategy<NavKey>()
     val selectedDestination = backStack.lastOrNull().toAppDestination()
-    val isSettingsVisible = backStack.lastOrNull() == SettingsKey
+    val chromeStrategy = rememberChromeStrategy(backStack)
 
-    BookNestAppScaffold(
-        selectedDestination = selectedDestination,
-        isSettingsVisible = isSettingsVisible,
-        allowSelectedDestinationClick = isSettingsVisible,
-        onDestinationSelect = { destination -> backStack.replaceWith(destination.rootKey()) },
+    Box(
+        modifier = modifier.fillMaxSize().background(MaterialTheme.colorScheme.background),
     ) {
         NavDisplay(
             backStack = backStack,
             onBack = { backStack.navigateBack(selectedDestination) },
             sceneStrategies = listOf(listDetailSceneStrategy),
+            sceneDecoratorStrategies = listOf(chromeStrategy),
             sizeTransform = null,
             transitionSpec = { bookNestForwardContentTransform() },
             popTransitionSpec = { bookNestPopContentTransform() },
             predictivePopTransitionSpec = { _ -> bookNestPopContentTransform() },
             entryProvider =
                 entryProvider {
-                    entry<HomeKey> {
+                    entry<HomeKey>(metadata = mapOf(BOOK_NEST_DESTINATION_KEY to HomeKey)) {
                         HomeRoot(
                             onNavigateToExplore = { backStack.replaceWith(ExploreKey) },
                             onNavigateToLibrary = { backStack.replaceWith(LibraryListKey) },
@@ -77,22 +85,27 @@ fun BookNestNavigation() {
                                     backStack.add(SettingsKey)
                                 }
                             },
+                            onNavigateToReader = { bookId ->
+                                if (backStack.lastOrNull() !is ReaderKey) {
+                                    backStack.add(ReaderKey(bookId))
+                                }
+                            },
                         )
                     }
-                    entry<ExploreKey> {
+                    entry<ExploreKey>(metadata = mapOf(BOOK_NEST_DESTINATION_KEY to ExploreKey)) {
                         ComingSoonScreen(destination = AppDestination.EXPLORE)
                     }
-                    entry<ProfileKey> {
+                    entry<ProfileKey>(metadata = mapOf(BOOK_NEST_DESTINATION_KEY to ProfileKey)) {
                         ComingSoonScreen(destination = AppDestination.PROFILE)
                     }
-                    entry<SettingsKey> {
+                    entry<SettingsKey>(metadata = mapOf(BOOK_NEST_DESTINATION_KEY to SettingsKey)) {
                         SettingsRoot(onNavigateBack = { backStack.removeLastOrNull() })
                     }
                     entry<LibraryListKey>(
                         metadata =
                             ListDetailSceneStrategy.listPane(
                                 detailPlaceholder = { BookDetailPane() },
-                            ),
+                            ) + mapOf(BOOK_NEST_DESTINATION_KEY to LibraryListKey),
                     ) {
                         LibraryListRoot(
                             onNavigateToBookDetail = { bookId ->
@@ -102,14 +115,35 @@ fun BookNestNavigation() {
                         )
                     }
                     entry<BookDetailKey>(
-                        metadata = ListDetailSceneStrategy.detailPane(),
+                        metadata =
+                            ListDetailSceneStrategy.detailPane() + mapOf(BOOK_NEST_DESTINATION_KEY to LibraryListKey),
                     ) { key ->
-                        BookDetailRoot(bookId = key.bookId)
+                        BookDetailRoot(
+                            bookId = key.bookId,
+                            onNavigateToReader = { bookId -> backStack.add(ReaderKey(bookId)) },
+                        )
+                    }
+                    entry<ReaderKey>(metadata = mapOf(BOOK_NEST_READER_SCENE to true)) { key ->
+                        ReaderRoot(
+                            bookId = key.bookId,
+                            onNavigateBack = {
+                                if (backStack.lastOrNull() == key) backStack.removeLastOrNull()
+                            },
+                        )
                     }
                 },
         )
     }
 }
+
+@Composable
+private fun rememberChromeStrategy(backStack: NavBackStack<NavKey>): BookNestChromeSceneStrategy =
+    remember(backStack) {
+        BookNestChromeSceneStrategy(
+            destinationForKey = { it.toAppDestination() },
+            onDestinationSelect = { destination -> backStack.replaceWith(destination.rootKey()) },
+        )
+    }
 
 private fun MutableList<NavKey>.replaceWith(rootKey: NavKey) {
     if (size != 1 || lastOrNull() != rootKey) {

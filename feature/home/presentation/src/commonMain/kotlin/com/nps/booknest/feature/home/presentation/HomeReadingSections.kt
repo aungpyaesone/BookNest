@@ -110,7 +110,7 @@ private fun CompactContinueReadingContent(
         }
         BookNestPrimaryButton(
             text = stringResource(Res.string.home_read_now),
-            onClick = { onAction(HomeAction.OnReadNowClick) },
+            onClick = { onAction(HomeAction.OnReadNowClick(book.bookId)) },
             modifier = Modifier.fillMaxWidth().testTag(HomeTestTags.READ_NOW_ACTION),
         )
     }
@@ -140,7 +140,7 @@ private fun WideContinueReadingContent(
             MoreOptionsButton(book = book, onAction = onAction)
             BookNestPrimaryButton(
                 text = stringResource(Res.string.home_read_now),
-                onClick = { onAction(HomeAction.OnReadNowClick) },
+                onClick = { onAction(HomeAction.OnReadNowClick(book.bookId)) },
                 modifier = Modifier.testTag(HomeTestTags.READ_NOW_ACTION),
             )
         }

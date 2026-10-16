@@ -10,9 +10,15 @@ data class BookDetailState(
 
 sealed interface BookDetailAction {
     data object OnRetryClick : BookDetailAction
+
+    data object OnReadClick : BookDetailAction
 }
 
 sealed interface BookDetailEvent {
+    data class NavigateToReader(
+        val bookId: String,
+    ) : BookDetailEvent
+
     data class ShowSnackbar(
         val message: UiText,
     ) : BookDetailEvent

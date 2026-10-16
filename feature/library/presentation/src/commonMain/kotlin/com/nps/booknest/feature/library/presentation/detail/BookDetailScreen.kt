@@ -4,6 +4,7 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.MaterialTheme
@@ -23,6 +24,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.nps.booknest.core.designsystem.BookNestPrimaryButton
 import com.nps.booknest.core.designsystem.BookNestSpacing
 import com.nps.booknest.core.designsystem.BookNestTheme
 import com.nps.booknest.core.presentation.ObserveAsEvents
@@ -32,6 +34,7 @@ import com.nps.booknest.feature.library.presentation.generated.resources.Res
 import com.nps.booknest.feature.library.presentation.generated.resources.book_detail_author
 import com.nps.booknest.feature.library.presentation.generated.resources.book_detail_missing
 import com.nps.booknest.feature.library.presentation.generated.resources.book_detail_placeholder
+import com.nps.booknest.feature.library.presentation.generated.resources.book_detail_read
 import com.nps.booknest.feature.library.presentation.generated.resources.book_detail_title
 import com.nps.booknest.feature.library.presentation.generated.resources.library_retry
 import org.jetbrains.compose.resources.stringResource
@@ -41,6 +44,7 @@ import org.koin.core.parameter.parametersOf
 @Composable
 fun BookDetailRoot(
     bookId: String,
+    onNavigateToReader: (String) -> Unit,
     modifier: Modifier = Modifier,
     viewModel: BookDetailViewModel = koinViewModel(parameters = { parametersOf(bookId) }),
 ) {
@@ -51,6 +55,7 @@ fun BookDetailRoot(
 
     ObserveAsEvents(viewModel.events) { event ->
         when (event) {
+            is BookDetailEvent.NavigateToReader -> onNavigateToReader(event.bookId)
             is BookDetailEvent.ShowSnackbar -> pendingSnackbar = event.message
         }
     }
@@ -120,6 +125,7 @@ fun BookDetailScreen(
             else -> {
                 BookDetailContent(
                     book = state.book,
+                    onAction = onAction,
                     modifier = Modifier.padding(contentPadding),
                 )
             }
@@ -130,6 +136,7 @@ fun BookDetailScreen(
 @Composable
 private fun BookDetailContent(
     book: Book,
+    onAction: (BookDetailAction) -> Unit,
     modifier: Modifier = Modifier,
 ) {
     Column(
@@ -155,6 +162,11 @@ private fun BookDetailContent(
             modifier = Modifier.padding(top = BookNestSpacing.small),
             color = MaterialTheme.colorScheme.onSurfaceVariant,
             style = MaterialTheme.typography.bodyMedium,
+        )
+        BookNestPrimaryButton(
+            text = stringResource(Res.string.book_detail_read),
+            onClick = { onAction(BookDetailAction.OnReadClick) },
+            modifier = Modifier.fillMaxWidth().padding(top = BookNestSpacing.large),
         )
     }
 }

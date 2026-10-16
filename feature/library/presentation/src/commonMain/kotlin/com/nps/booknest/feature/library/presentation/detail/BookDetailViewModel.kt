@@ -31,6 +31,7 @@ class BookDetailViewModel(
     fun onAction(action: BookDetailAction) {
         when (action) {
             BookDetailAction.OnRetryClick -> observeBook()
+            BookDetailAction.OnReadClick -> sendEvent(BookDetailEvent.NavigateToReader(bookId))
         }
     }
 
@@ -56,5 +57,9 @@ class BookDetailViewModel(
                     }
                 }
             }
+    }
+
+    private fun sendEvent(event: BookDetailEvent) {
+        viewModelScope.launch { eventChannel.send(event) }
     }
 }

@@ -89,6 +89,23 @@ class HomeViewModelTest {
         }
 
     @Test
+    fun `read now click emits reader navigation with selected identifier`() =
+        runTest {
+            Dispatchers.setMain(StandardTestDispatcher(testScheduler))
+            try {
+                val viewModel = HomeViewModel()
+                viewModel.events.test {
+                    viewModel.onAction(HomeAction.OnReadNowClick("mountain-morning"))
+                    runCurrent()
+
+                    assertThat(awaitItem()).isEqualTo(HomeEvent.NavigateToReader("mountain-morning"))
+                }
+            } finally {
+                Dispatchers.resetMain()
+            }
+        }
+
+    @Test
     fun `buy click emits localized coming soon message`() =
         runTest {
             Dispatchers.setMain(StandardTestDispatcher(testScheduler))
