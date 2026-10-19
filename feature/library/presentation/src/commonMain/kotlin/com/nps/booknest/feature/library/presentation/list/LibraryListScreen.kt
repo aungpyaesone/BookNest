@@ -28,6 +28,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.nps.booknest.core.designsystem.BookNestAdaptiveText
 import com.nps.booknest.core.designsystem.BookNestSpacing
 import com.nps.booknest.core.designsystem.BookNestTheme
 import com.nps.booknest.core.presentation.ObserveAsEvents
@@ -79,45 +80,47 @@ fun LibraryListScreen(
     modifier: Modifier = Modifier,
     snackbarHostState: SnackbarHostState = remember { SnackbarHostState() },
 ) {
-    Scaffold(
-        modifier = modifier,
-        snackbarHost = { SnackbarHost(snackbarHostState) },
-    ) { contentPadding ->
-        Column(
-            modifier =
-                Modifier
-                    .fillMaxSize()
-                    .padding(contentPadding),
-        ) {
-            Text(
-                text = stringResource(Res.string.library_list_title),
-                modifier = Modifier.padding(horizontal = BookNestSpacing.large, vertical = BookNestSpacing.large),
-                style = MaterialTheme.typography.titleLarge,
-                fontWeight = FontWeight.SemiBold,
-            )
+    BookNestAdaptiveText {
+        Scaffold(
+            modifier = modifier,
+            snackbarHost = { SnackbarHost(snackbarHostState) },
+        ) { contentPadding ->
+            Column(
+                modifier =
+                    Modifier
+                        .fillMaxSize()
+                        .padding(contentPadding),
+            ) {
+                Text(
+                    text = stringResource(Res.string.library_list_title),
+                    modifier = Modifier.padding(horizontal = BookNestSpacing.large, vertical = BookNestSpacing.large),
+                    style = MaterialTheme.typography.titleLarge,
+                    fontWeight = FontWeight.SemiBold,
+                )
 
-            when {
-                state.isLoading -> {
-                    LoadingLibraryContent()
-                }
+                when {
+                    state.isLoading -> {
+                        LoadingLibraryContent()
+                    }
 
-                state.books.isEmpty() -> {
-                    EmptyLibraryContent()
-                }
+                    state.books.isEmpty() -> {
+                        EmptyLibraryContent()
+                    }
 
-                else -> {
-                    LazyColumn(
-                        contentPadding = PaddingValues(bottom = BookNestSpacing.extraLarge),
-                    ) {
-                        items(
-                            items = state.books,
-                            key = Book::id,
-                        ) { book ->
-                            BookListItem(
-                                book = book,
-                                onClick = { onAction(LibraryListAction.OnBookClick(book.id)) },
-                            )
-                            HorizontalDivider()
+                    else -> {
+                        LazyColumn(
+                            contentPadding = PaddingValues(bottom = BookNestSpacing.extraLarge),
+                        ) {
+                            items(
+                                items = state.books,
+                                key = Book::id,
+                            ) { book ->
+                                BookListItem(
+                                    book = book,
+                                    onClick = { onAction(LibraryListAction.OnBookClick(book.id)) },
+                                )
+                                HorizontalDivider()
+                            }
                         }
                     }
                 }

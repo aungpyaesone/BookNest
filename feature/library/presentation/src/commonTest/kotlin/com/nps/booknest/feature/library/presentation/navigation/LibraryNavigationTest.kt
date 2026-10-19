@@ -25,4 +25,12 @@ class LibraryNavigationTest {
 
         assertThat(backStack).isEqualTo(listOf(LibraryListKey))
     }
+
+    @Test
+    fun `overview key serializes independently of local library`() {
+        val key: LibraryNavKey = LibraryOverviewKey
+        assertThat(Json.decodeFromString<LibraryNavKey>(Json.encodeToString(key))).isEqualTo(key)
+        assertThat(Json.decodeFromString<LibraryNavKey>(Json.encodeToString<LibraryNavKey>(LibraryListKey)))
+            .isEqualTo(LibraryListKey)
+    }
 }

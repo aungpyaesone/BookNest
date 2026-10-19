@@ -50,3 +50,5 @@ include(":feature:reader:data")
 include(":feature:reader:presentation")
 include(":feature:settings:presentation")
 include(":shared")
+
+include(":feature:profile:presentation")

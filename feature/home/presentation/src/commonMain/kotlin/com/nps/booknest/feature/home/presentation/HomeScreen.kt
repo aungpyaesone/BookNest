@@ -34,11 +34,14 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.platform.LocalWindowInfo
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.nps.booknest.core.designsystem.BookNestAdaptiveText
 import com.nps.booknest.core.designsystem.BookNestLogo
 import com.nps.booknest.core.designsystem.BookNestSearchField
 import com.nps.booknest.core.designsystem.BookNestSize
@@ -96,6 +99,7 @@ fun HomeRoot(
     onNavigateToLibrary: () -> Unit,
     onNavigateToSettings: () -> Unit,
     onNavigateToReader: (String) -> Unit,
+    onNavigateToCatalog: (String?) -> Unit,
     modifier: Modifier = Modifier,
     viewModel: HomeViewModel = koinViewModel(),
 ) {
@@ -106,6 +110,8 @@ fun HomeRoot(
 
     ObserveAsEvents(viewModel.events) { event ->
         when (event) {
+            HomeEvent.NavigateToAllBooks -> onNavigateToCatalog(null)
+            is HomeEvent.NavigateToCategory -> onNavigateToCatalog(event.categoryId)
             HomeEvent.NavigateToExplore -> onNavigateToExplore()
             HomeEvent.NavigateToLibrary -> onNavigateToLibrary()
             HomeEvent.NavigateToSettings -> onNavigateToSettings()
@@ -136,26 +142,28 @@ fun HomeScreen(
     snackbarHostState: SnackbarHostState = remember { SnackbarHostState() },
     layoutMode: HomeLayoutMode? = null,
 ) {
-    BoxWithConstraints(modifier = modifier.fillMaxSize()) {
-        val resolvedLayoutMode = layoutMode ?: homeLayoutMode(maxWidth)
-        Scaffold(
-            containerColor = MaterialTheme.colorScheme.background,
-            snackbarHost = { SnackbarHost(snackbarHostState) },
-            topBar = {
-                HomeHeader(
-                    onNotificationClick = { onAction(HomeAction.OnNotificationClick) },
-                    onSettingsClick = { onAction(HomeAction.OnSettingsClick) },
-                    layoutMode = resolvedLayoutMode,
-                )
-            },
-        ) { contentPadding ->
-            if (resolvedLayoutMode == HomeLayoutMode.COMPACT) {
-                CompactHomeFeed(state, onAction, contentPadding)
-            } else {
-                AdaptiveHomeFeed(state, onAction, contentPadding, resolvedLayoutMode)
+    BookNestAdaptiveText {
+        BoxWithConstraints(modifier = modifier.fillMaxSize()) {
+            val resolvedLayoutMode = layoutMode ?: homeLayoutMode(maxWidth)
+            Scaffold(
+                containerColor = MaterialTheme.colorScheme.background,
+                snackbarHost = { SnackbarHost(snackbarHostState) },
+                topBar = {
+                    HomeHeader(
+                        onNotificationClick = { onAction(HomeAction.OnNotificationClick) },
+                        onSettingsClick = { onAction(HomeAction.OnSettingsClick) },
+                        layoutMode = resolvedLayoutMode,
+                    )
+                },
+            ) { contentPadding ->
+                if (resolvedLayoutMode == HomeLayoutMode.COMPACT) {
+                    CompactHomeFeed(state, onAction, contentPadding)
+                } else {
+                    AdaptiveHomeFeed(state, onAction, contentPadding, resolvedLayoutMode)
+                }
             }
+            if (state.isFilterSheetVisible) HomeFilterSheet(state = state, onAction = onAction)
         }
-        if (state.isFilterSheetVisible) HomeFilterSheet(state = state, onAction = onAction)
     }
 }
 
@@ -214,6 +222,9 @@ private fun AdaptiveHomeFeed(
     contentPadding: PaddingValues,
     layoutMode: HomeLayoutMode,
 ) {
+    val window = LocalWindowInfo.current.containerSize
+    val density = LocalDensity.current.density
+    val columns = homePopularBookColumns(window.width / density, window.height / density, layoutMode)
     Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.TopCenter) {
         LazyColumn(
             modifier =
@@ -228,7 +239,7 @@ private fun AdaptiveHomeFeed(
                     end = BookNestSpacing.screenExpanded,
                     bottom = contentPadding.calculateBottomPadding() + BookNestSpacing.section,
                 ),
-            verticalArrangement = Arrangement.spacedBy(BookNestSpacing.section),
+            verticalArrangement = Arrangement.spacedBy(BookNestSpacing.large),
         ) {
             item { HomeSearch(state = state, onAction = onAction, layoutMode = layoutMode) }
             item { HomeFeedStatus(state, onAction) }
@@ -239,14 +250,14 @@ private fun AdaptiveHomeFeed(
                     PopularBooks(
                         state = state,
                         onAction = onAction,
-                        columns = if (layoutMode == HomeLayoutMode.EXPANDED) 6 else 3,
+                        columns = columns,
                         layoutMode = layoutMode,
                     )
                 }
             }
             item {
                 if (layoutMode == HomeLayoutMode.MEDIUM) {
-                    Column(verticalArrangement = Arrangement.spacedBy(BookNestSpacing.extraLarge)) {
+                    Column(verticalArrangement = Arrangement.spacedBy(BookNestSpacing.large)) {
                         ContinueReadingCard(state.continueReading, onAction, layoutMode)
                         PremiumBanner(
                             onUpgradeClick = { onAction(HomeAction.OnUpgradeClick) },
@@ -254,7 +265,7 @@ private fun AdaptiveHomeFeed(
                         )
                     }
                 } else {
-                    Row(horizontalArrangement = Arrangement.spacedBy(BookNestSpacing.extraLarge)) {
+                    Row(horizontalArrangement = Arrangement.spacedBy(BookNestSpacing.large)) {
                         ContinueReadingCard(
                             state.continueReading,
                             onAction,

@@ -2,6 +2,7 @@ package com.nps.booknest.feature.explore.presentation
 
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.aspectRatio
@@ -13,16 +14,19 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import com.nps.booknest.core.designsystem.BookNestBookCover
 import com.nps.booknest.core.designsystem.BookNestSpacing
+import com.nps.booknest.core.designsystem.bookNestAdaptiveCompactTypography
 import com.nps.booknest.feature.explore.presentation.generated.resources.Res
 import com.nps.booknest.feature.explore.presentation.generated.resources.explore_back
 import com.nps.booknest.feature.explore.presentation.generated.resources.explore_cover_description
@@ -37,7 +41,13 @@ internal fun ExploreAppBar(
     onBack: (() -> Unit)? = null,
 ) {
     TopAppBar(
-        title = { Text(title, style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.SemiBold) },
+        title = {
+            Text(
+                title,
+                style = bookNestAdaptiveCompactTypography().titleMedium,
+                fontWeight = FontWeight.SemiBold,
+            )
+        },
         navigationIcon = {
             if (onBack != null) {
                 IconButton(onClick = onBack, modifier = Modifier.testTag("explore_back")) {
@@ -62,31 +72,47 @@ internal fun ExploreBookCard(
         modifier = modifier.clickable(onClick = onClick).testTag("explore_book_${book.id}"),
         verticalArrangement = Arrangement.spacedBy(BookNestSpacing.extraSmall),
     ) {
-        BookNestBookCover(
-            imageUrl = book.coverUrl,
-            title = book.title,
-            contentDescription = stringResource(Res.string.explore_cover_description, book.title),
-            modifier = Modifier.fillMaxWidth().aspectRatio(0.68f),
-        )
+        Box {
+            BookNestBookCover(
+                imageUrl = book.coverUrl,
+                title = book.title,
+                contentDescription = stringResource(Res.string.explore_cover_description, book.title),
+                modifier = Modifier.fillMaxWidth().aspectRatio(0.68f),
+            )
+            if (book.isDemo) {
+                Surface(
+                    modifier = Modifier.align(Alignment.TopStart),
+                    color = MaterialTheme.colorScheme.secondaryContainer,
+                    shape = MaterialTheme.shapes.extraSmall,
+                ) {
+                    Text(
+                        stringResource(Res.string.explore_demo),
+                        Modifier.padding(horizontal = BookNestSpacing.extraSmall),
+                        style = bookNestAdaptiveCompactTypography().labelSmall,
+                    )
+                }
+            }
+        }
         Text(
             book.title,
-            style = MaterialTheme.typography.labelMedium,
+            style = bookNestAdaptiveCompactTypography().labelMedium,
             fontWeight = FontWeight.Bold,
+            minLines = 3,
             maxLines = 3,
             overflow = TextOverflow.Ellipsis,
         )
         if (showDetails) {
             Text(
                 book.author,
-                style = MaterialTheme.typography.labelMedium,
+                style = bookNestAdaptiveCompactTypography().labelSmall,
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
+                minLines = 2,
                 maxLines = 2,
                 overflow = TextOverflow.Ellipsis,
             )
-            if (book.isDemo) Text(stringResource(Res.string.explore_demo), style = MaterialTheme.typography.labelSmall)
             Text(
                 book.priceText,
-                style = MaterialTheme.typography.labelMedium,
+                style = bookNestAdaptiveCompactTypography().labelSmall,
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
             )
         }

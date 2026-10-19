@@ -43,6 +43,7 @@ import androidx.compose.ui.unit.dp
 import com.nps.booknest.core.designsystem.BookNestPrimaryButton
 import com.nps.booknest.core.designsystem.BookNestSize
 import com.nps.booknest.core.designsystem.BookNestSpacing
+import com.nps.booknest.core.designsystem.bookNestAdaptiveCompactTypography
 import com.nps.booknest.feature.home.presentation.generated.resources.Res
 import com.nps.booknest.feature.home.presentation.generated.resources.home_continue_reading_title
 import com.nps.booknest.feature.home.presentation.generated.resources.home_more_options_description
@@ -297,7 +298,6 @@ internal fun SectionHeader(
     onActionClick: () -> Unit,
     layoutMode: HomeLayoutMode,
 ) {
-    val isCompact = layoutMode == HomeLayoutMode.COMPACT
     Row(
         modifier = Modifier.fillMaxWidth(),
         horizontalArrangement = Arrangement.SpaceBetween,
@@ -306,7 +306,14 @@ internal fun SectionHeader(
         Text(
             text = title,
             modifier = Modifier.weight(1f),
-            style = if (isCompact) MaterialTheme.typography.titleMedium else MaterialTheme.typography.titleLarge,
+            style =
+                if (layoutMode ==
+                    HomeLayoutMode.COMPACT
+                ) {
+                    bookNestAdaptiveCompactTypography().titleMedium
+                } else {
+                    bookNestAdaptiveCompactTypography().titleLarge
+                },
             fontWeight = FontWeight.SemiBold,
         )
         Row(
@@ -319,7 +326,14 @@ internal fun SectionHeader(
             Text(
                 text = action,
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
-                style = if (isCompact) MaterialTheme.typography.labelMedium else MaterialTheme.typography.labelLarge,
+                style =
+                    if (layoutMode ==
+                        HomeLayoutMode.COMPACT
+                    ) {
+                        bookNestAdaptiveCompactTypography().labelSmall
+                    } else {
+                        bookNestAdaptiveCompactTypography().bodySmall
+                    },
             )
             Icon(
                 Icons.Outlined.ChevronRight,

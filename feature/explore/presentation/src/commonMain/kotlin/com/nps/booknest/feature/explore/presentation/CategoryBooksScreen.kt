@@ -23,7 +23,6 @@ import androidx.compose.foundation.lazy.grid.rememberLazyGridState
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
-import androidx.compose.material3.FilterChip
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarHost
@@ -46,9 +45,14 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import coil3.compose.AsyncImage
+import com.nps.booknest.core.designsystem.BookNestAdaptiveText
+import com.nps.booknest.core.designsystem.BookNestSelectionChip
 import com.nps.booknest.core.designsystem.BookNestSize
 import com.nps.booknest.core.designsystem.BookNestSpacing
 import com.nps.booknest.core.designsystem.BookNestTheme
+import com.nps.booknest.core.designsystem.bookNestAdaptiveCompactTypography
+import com.nps.booknest.core.designsystem.bookNestCatalogColumns
+import com.nps.booknest.core.designsystem.bookNestIsTablet
 import com.nps.booknest.core.presentation.ObserveAsEvents
 import com.nps.booknest.feature.explore.presentation.generated.resources.Res
 import com.nps.booknest.feature.explore.presentation.generated.resources.explore_all
@@ -89,24 +93,26 @@ fun CategoryBooksScreen(
     modifier: Modifier = Modifier,
     snackbar: SnackbarHostState = remember { SnackbarHostState() },
 ) {
-    Scaffold(
-        modifier = modifier.testTag("category_books_screen"),
-        topBar = {
-            ExploreAppBar(state.category?.name.orEmpty(), onBack = { onAction(CategoryBooksAction.OnBackClick) })
-        },
-        snackbarHost = { SnackbarHost(snackbar) },
-        contentWindowInsets = WindowInsets(0, 0, 0, 0),
-    ) { padding ->
-        if (state.hasShownCatalog) {
-            CategoryBookGrid(state, onAction, Modifier.padding(padding))
-        } else {
-            ExploreInitialStatus(
-                isLoading = state.isLoading,
-                isRefreshing = state.isRefreshing,
-                error = state.error,
-                onRetry = { onAction(CategoryBooksAction.OnRefreshClick) },
-                modifier = Modifier.padding(padding),
-            )
+    BookNestAdaptiveText {
+        Scaffold(
+            modifier = modifier.testTag("category_books_screen"),
+            topBar = {
+                ExploreAppBar(state.category?.name.orEmpty(), onBack = { onAction(CategoryBooksAction.OnBackClick) })
+            },
+            snackbarHost = { SnackbarHost(snackbar) },
+            contentWindowInsets = WindowInsets(0, 0, 0, 0),
+        ) { padding ->
+            if (state.hasShownCatalog) {
+                CategoryBookGrid(state, onAction, Modifier.padding(padding))
+            } else {
+                ExploreInitialStatus(
+                    isLoading = state.isLoading,
+                    isRefreshing = state.isRefreshing,
+                    error = state.error,
+                    onRetry = { onAction(CategoryBooksAction.OnRefreshClick) },
+                    modifier = Modifier.padding(padding),
+                )
+            }
         }
     }
 }
@@ -122,7 +128,16 @@ private fun CategoryBookGrid(
     BoxWithConstraints(modifier.fillMaxSize(), contentAlignment = Alignment.TopCenter) {
         val horizontalPadding =
             if (maxWidth < 600.dp) BookNestSpacing.screenCompact else BookNestSpacing.screenExpanded
-        val columns = if (maxWidth < 600.dp) GridCells.Fixed(3) else GridCells.Adaptive(120.dp)
+        val contentWidth = maxWidth.coerceAtMost(BookNestSize.contentMaxWidth) - horizontalPadding * 2
+        val columns =
+            GridCells.Fixed(
+                bookNestCatalogColumns(
+                    maxWidth,
+                    contentWidth,
+                    LocalDensity.current.fontScale,
+                    if (bookNestIsTablet()) 136.dp else 112.dp,
+                ),
+            )
         LazyVerticalGrid(
             columns = columns,
             state = gridState,
@@ -133,8 +148,8 @@ private fun CategoryBookGrid(
                     ).fillMaxSize()
                     .testTag("category_books_grid"),
             contentPadding = PaddingValues(horizontal = horizontalPadding, vertical = BookNestSpacing.small),
-            horizontalArrangement = Arrangement.spacedBy(BookNestSpacing.large),
-            verticalArrangement = Arrangement.spacedBy(BookNestSpacing.large),
+            horizontalArrangement = Arrangement.spacedBy(BookNestSpacing.small),
+            verticalArrangement = Arrangement.spacedBy(BookNestSpacing.medium),
         ) {
             state.category?.let { category ->
                 item(key = "catalog_hero", span = { GridItemSpan(maxLineSpan) }) { CategoryHero(category) }
@@ -252,15 +267,15 @@ private fun CategoryHero(category: ExploreCategoryUi) {
             ) {
                 Column(
                     modifier = Modifier.weight(1.3f),
-                    verticalArrangement = Arrangement.spacedBy(BookNestSpacing.small),
+                    verticalArrangement = Arrangement.spacedBy(BookNestSpacing.extraSmall),
                 ) {
                     Text(
                         category.name,
                         style =
                             if (isCompact) {
-                                MaterialTheme.typography.titleLarge
+                                bookNestAdaptiveCompactTypography().titleLarge
                             } else {
-                                MaterialTheme.typography.headlineSmall
+                                bookNestAdaptiveCompactTypography().headlineSmall
                             },
                         fontWeight = FontWeight.Bold,
                     )
@@ -268,9 +283,9 @@ private fun CategoryHero(category: ExploreCategoryUi) {
                         stringResource(Res.string.explore_category_description),
                         style =
                             if (isCompact) {
-                                MaterialTheme.typography.bodySmall
+                                bookNestAdaptiveCompactTypography().bodySmall
                             } else {
-                                MaterialTheme.typography.bodyMedium
+                                bookNestAdaptiveCompactTypography().bodyMedium
                             },
                     )
                 }
@@ -297,18 +312,20 @@ private fun CategorySubcategories(
         horizontalArrangement = Arrangement.spacedBy(BookNestSpacing.small),
     ) {
         item(key = "all") {
-            FilterChip(
+            BookNestSelectionChip(
+                textStyle = bookNestAdaptiveCompactTypography().labelSmall,
                 selected = state.selectedSubcategoryId == null,
                 onClick = { onAction(CategoryBooksAction.OnSubcategoryClick(null)) },
-                label = { Text(stringResource(Res.string.explore_all), style = MaterialTheme.typography.labelSmall) },
+                label = stringResource(Res.string.explore_all),
                 modifier = Modifier.testTag("category_chip_all"),
             )
         }
         items(state.subcategories, key = { it.id }) { category ->
-            FilterChip(
+            BookNestSelectionChip(
+                textStyle = bookNestAdaptiveCompactTypography().labelSmall,
                 selected = state.selectedSubcategoryId == category.id,
                 onClick = { onAction(CategoryBooksAction.OnSubcategoryClick(category.id)) },
-                label = { Text(category.name, style = MaterialTheme.typography.labelSmall) },
+                label = category.name,
                 modifier = Modifier.testTag("category_chip_${category.id}"),
             )
         }

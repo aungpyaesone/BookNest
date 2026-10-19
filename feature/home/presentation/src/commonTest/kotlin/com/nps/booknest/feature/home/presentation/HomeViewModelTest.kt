@@ -109,17 +109,25 @@ class HomeViewModelTest {
         }
 
     @Test
-    fun `category click reports coming soon without filtering books`() =
+    fun `category and all clicks navigate without filtering home books`() =
         runHomeTest {
             val viewModel = HomeViewModel(FakeHomeRepository())
             runCurrent()
             viewModel.events.test {
                 viewModel.onAction(HomeAction.OnCategoryClick(viewModel.state.value.categories[1]))
                 runCurrent()
-                assertIs<HomeEvent.ShowSnackbar>(awaitItem())
+                assertEquals(
+                    HomeEvent.NavigateToCategory(
+                        viewModel.state.value.categories[1]
+                            .id
+                            .toString(),
+                    ),
+                    awaitItem(),
+                )
                 assertEquals(2, viewModel.state.value.visibleBooks.size)
                 viewModel.onAction(HomeAction.OnCategoryClick(homeAllCategory))
-                expectNoEvents()
+                runCurrent()
+                assertEquals(HomeEvent.NavigateToAllBooks, awaitItem())
             }
         }
 

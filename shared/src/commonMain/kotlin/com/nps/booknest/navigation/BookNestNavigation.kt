@@ -19,24 +19,29 @@ import androidx.compose.material3.adaptive.navigation3.rememberListDetailSceneSt
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
+import androidx.lifecycle.viewmodel.navigation3.rememberViewModelStoreNavEntryDecorator
 import androidx.navigation3.runtime.NavBackStack
 import androidx.navigation3.runtime.NavKey
 import androidx.navigation3.runtime.entryProvider
 import androidx.navigation3.runtime.rememberNavBackStack
+import androidx.navigation3.runtime.rememberSaveableStateHolderNavEntryDecorator
 import androidx.navigation3.ui.NavDisplay
 import androidx.savedstate.serialization.SavedStateConfiguration
 import com.nps.booknest.feature.explore.presentation.CategoryBooksRoot
 import com.nps.booknest.feature.explore.presentation.ExploreRoot
 import com.nps.booknest.feature.explore.presentation.navigation.CategoryBooksKey
 import com.nps.booknest.feature.explore.presentation.navigation.exploreNavigationSerializers
-import com.nps.booknest.feature.home.presentation.HomeRoot
 import com.nps.booknest.feature.home.presentation.navigation.HomeKey
 import com.nps.booknest.feature.home.presentation.navigation.homeNavigationSerializers
 import com.nps.booknest.feature.library.presentation.detail.BookDetailPane
 import com.nps.booknest.feature.library.presentation.detail.BookDetailRoot
 import com.nps.booknest.feature.library.presentation.list.LibraryListRoot
 import com.nps.booknest.feature.library.presentation.navigation.BookDetailKey
+import com.nps.booknest.feature.library.presentation.navigation.CollectionsKey
 import com.nps.booknest.feature.library.presentation.navigation.LibraryListKey
+import com.nps.booknest.feature.library.presentation.navigation.LibraryOverviewKey
+import com.nps.booknest.feature.library.presentation.navigation.MyBooksKey
+import com.nps.booknest.feature.library.presentation.navigation.ReadingNowKey
 import com.nps.booknest.feature.library.presentation.navigation.libraryNavigationSerializers
 import com.nps.booknest.feature.reader.presentation.ReaderRoot
 import com.nps.booknest.feature.reader.presentation.navigation.ReaderKey
@@ -76,6 +81,11 @@ fun BookNestNavigation(modifier: Modifier = Modifier) {
     ) {
         NavDisplay(
             backStack = backStack,
+            entryDecorators =
+                listOf(
+                    rememberSaveableStateHolderNavEntryDecorator(),
+                    rememberViewModelStoreNavEntryDecorator(),
+                ),
             onBack = { backStack.navigateBack(backStack.lastOrNull().toAppDestination()) },
             sceneStrategies = listOf(rememberListDetailSceneStrategy<NavKey>()),
             sceneDecoratorStrategies = listOf(chromeStrategy),
@@ -86,20 +96,7 @@ fun BookNestNavigation(modifier: Modifier = Modifier) {
             entryProvider =
                 entryProvider {
                     entry<HomeKey>(metadata = mapOf(BOOK_NEST_DESTINATION_KEY to HomeKey)) {
-                        HomeRoot(
-                            onNavigateToExplore = { backStack.replaceWith(ExploreKey) },
-                            onNavigateToLibrary = { backStack.replaceWith(LibraryListKey) },
-                            onNavigateToSettings = {
-                                if (backStack.lastOrNull() != SettingsKey) {
-                                    backStack.add(SettingsKey)
-                                }
-                            },
-                            onNavigateToReader = { bookId ->
-                                if (backStack.lastOrNull() !is ReaderKey) {
-                                    backStack.add(ReaderKey(bookId))
-                                }
-                            },
-                        )
+                        HomeDestination(backStack)
                     }
                     entry<ExploreKey>(metadata = mapOf(BOOK_NEST_DESTINATION_KEY to ExploreKey)) {
                         ExploreDestination(backStack)
@@ -107,12 +104,11 @@ fun BookNestNavigation(modifier: Modifier = Modifier) {
                     entry<CategoryBooksKey>(metadata = categoryBooksSceneMetadata) { key ->
                         CategoryBooksDestination(key, backStack)
                     }
-                    entry<ProfileKey>(metadata = mapOf(BOOK_NEST_DESTINATION_KEY to ProfileKey)) {
-                        ComingSoonScreen(destination = AppDestination.PROFILE)
-                    }
+                    profileEntries(backStack)
                     entry<SettingsKey>(metadata = mapOf(BOOK_NEST_DESTINATION_KEY to SettingsKey)) {
                         SettingsRoot(onNavigateBack = { backStack.removeLastOrNull() })
                     }
+                    libraryBrowseEntries(backStack)
                     entry<LibraryListKey>(
                         metadata =
                             ListDetailSceneStrategy.listPane(
@@ -175,7 +171,7 @@ private fun rememberChromeStrategy(backStack: NavBackStack<NavKey>): BookNestChr
         )
     }
 
-private fun MutableList<NavKey>.replaceWith(rootKey: NavKey) {
+internal fun MutableList<NavKey>.replaceWith(rootKey: NavKey) {
     if (size != 1 || lastOrNull() != rootKey) {
         clear()
         add(rootKey)
@@ -241,25 +237,29 @@ internal fun bookNestPopContentTransform(): ContentTransform =
             ),
     )
 
-private fun AppDestination.rootKey(): NavKey =
+internal fun AppDestination.rootKey(): NavKey =
     when (this) {
         AppDestination.HOME -> HomeKey
         AppDestination.EXPLORE -> ExploreKey
-        AppDestination.LIBRARY -> LibraryListKey
+        AppDestination.LIBRARY -> LibraryOverviewKey
         AppDestination.PROFILE -> ProfileKey
     }
 
-private fun NavKey?.toAppDestination(): AppDestination =
+internal fun NavKey?.toAppDestination(): AppDestination =
     when (this) {
         HomeKey -> AppDestination.HOME
 
         ExploreKey, is CategoryBooksKey -> AppDestination.EXPLORE
 
+        LibraryOverviewKey,
+        ReadingNowKey,
+        CollectionsKey,
+        MyBooksKey,
         LibraryListKey,
         is BookDetailKey,
         -> AppDestination.LIBRARY
 
-        ProfileKey -> AppDestination.PROFILE
+        ProfileKey, EditProfileKey, ProfileSettingsKey -> AppDestination.PROFILE
 
         SettingsKey -> AppDestination.HOME
 

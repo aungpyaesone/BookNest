@@ -54,6 +54,7 @@ kotlin {
             implementation(project(":feature:reader:domain"))
             implementation(project(":feature:reader:presentation"))
             implementation(project(":feature:settings:presentation"))
+            implementation(project(":feature:profile:presentation"))
             implementation(libs.androidx.lifecycle.runtimeCompose)
             implementation(libs.androidx.lifecycle.viewmodelCompose)
             implementation(libs.androidx.lifecycle.viewmodelNavigation3)
@@ -83,6 +84,7 @@ kotlin {
             implementation(libs.kotlinx.coroutines.test)
         }
         getByName("androidDeviceTest").dependencies {
+            implementation(project(":feature:home:domain"))
             implementation(project(":feature:explore:domain"))
             implementation(project(":core:domain"))
             implementation(libs.androidx.test.runner)

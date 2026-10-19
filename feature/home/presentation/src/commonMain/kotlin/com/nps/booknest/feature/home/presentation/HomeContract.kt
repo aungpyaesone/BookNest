@@ -134,6 +134,12 @@ sealed interface HomeAction {
 }
 
 sealed interface HomeEvent {
+    data object NavigateToAllBooks : HomeEvent
+
+    data class NavigateToCategory(
+        val categoryId: String,
+    ) : HomeEvent
+
     data object NavigateToExplore : HomeEvent
 
     data object NavigateToLibrary : HomeEvent

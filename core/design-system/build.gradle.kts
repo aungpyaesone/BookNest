@@ -21,6 +21,7 @@ kotlin {
                 .toInt()
         compilerOptions { jvmTarget = JvmTarget.JVM_11 }
         androidResources.enable = true
+        withHostTest {}
     }
 
     sourceSets {
@@ -33,6 +34,9 @@ kotlin {
             implementation(libs.compose.runtime)
             implementation(libs.compose.ui)
             implementation(libs.compose.uiToolingPreview)
+        }
+        commonTest.dependencies {
+            implementation(libs.kotlin.test)
         }
         androidMain.dependencies {
             implementation(libs.compose.uiTooling)

@@ -34,6 +34,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.nps.booknest.core.designsystem.BookNestAdaptiveText
 import com.nps.booknest.core.designsystem.BookNestSize
 import com.nps.booknest.core.designsystem.BookNestSpacing
 import com.nps.booknest.core.designsystem.BookNestTheme
@@ -83,48 +84,50 @@ fun SettingsScreen(
     onAction: (SettingsAction) -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    Scaffold(
-        modifier = modifier.testTag(SettingsTestTags.SCREEN),
-        containerColor = MaterialTheme.colorScheme.background,
-        topBar = {
-            TopAppBar(
-                modifier = Modifier.testTag(SettingsTestTags.APP_BAR),
-                title = {
-                    Text(
-                        text = stringResource(Res.string.settings_title),
-                        modifier = Modifier.testTag(SettingsTestTags.TITLE),
-                        style = MaterialTheme.typography.titleLarge,
-                        fontWeight = FontWeight.SemiBold,
-                    )
-                },
-                navigationIcon = {
-                    IconButton(
-                        onClick = { onAction(SettingsAction.OnBackClick) },
-                        modifier =
-                            Modifier
-                                .size(BookNestSize.minimumTouchTarget)
-                                .testTag(SettingsTestTags.BACK_ACTION),
-                    ) {
-                        Icon(
-                            imageVector = Icons.AutoMirrored.Outlined.ArrowBack,
-                            contentDescription = stringResource(Res.string.settings_back_description),
-                            modifier = Modifier.size(BookNestSize.iconSmall),
+    BookNestAdaptiveText {
+        Scaffold(
+            modifier = modifier.testTag(SettingsTestTags.SCREEN),
+            containerColor = MaterialTheme.colorScheme.background,
+            topBar = {
+                TopAppBar(
+                    modifier = Modifier.testTag(SettingsTestTags.APP_BAR),
+                    title = {
+                        Text(
+                            text = stringResource(Res.string.settings_title),
+                            modifier = Modifier.testTag(SettingsTestTags.TITLE),
+                            style = MaterialTheme.typography.titleLarge,
+                            fontWeight = FontWeight.SemiBold,
                         )
-                    }
-                },
-                colors =
-                    TopAppBarDefaults.topAppBarColors(
-                        containerColor = MaterialTheme.colorScheme.background,
-                    ),
-                windowInsets = WindowInsets(0, 0, 0, 0),
+                    },
+                    navigationIcon = {
+                        IconButton(
+                            onClick = { onAction(SettingsAction.OnBackClick) },
+                            modifier =
+                                Modifier
+                                    .size(BookNestSize.minimumTouchTarget)
+                                    .testTag(SettingsTestTags.BACK_ACTION),
+                        ) {
+                            Icon(
+                                imageVector = Icons.AutoMirrored.Outlined.ArrowBack,
+                                contentDescription = stringResource(Res.string.settings_back_description),
+                                modifier = Modifier.size(BookNestSize.iconSmall),
+                            )
+                        }
+                    },
+                    colors =
+                        TopAppBarDefaults.topAppBarColors(
+                            containerColor = MaterialTheme.colorScheme.background,
+                        ),
+                    windowInsets = WindowInsets(0, 0, 0, 0),
+                )
+            },
+        ) { contentPadding ->
+            SettingsContent(
+                state = state,
+                onAction = onAction,
+                modifier = Modifier.padding(contentPadding),
             )
-        },
-    ) { contentPadding ->
-        SettingsContent(
-            state = state,
-            onAction = onAction,
-            modifier = Modifier.padding(contentPadding),
-        )
+        }
     }
 }
 

@@ -76,7 +76,7 @@ fun BookNestSearchField(
                         Modifier
                             .weight(
                                 1f,
-                            ).padding(horizontal = BookNestSpacing.small, vertical = BookNestSpacing.medium),
+                            ).padding(horizontal = BookNestSpacing.small, vertical = BookNestSpacing.small),
                     contentAlignment = Alignment.CenterStart,
                 ) {
                     if (query.isEmpty()) {

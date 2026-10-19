@@ -10,6 +10,7 @@ import com.nps.booknest.feature.home.data.homeDataModule
 import com.nps.booknest.feature.home.presentation.homePresentationModule
 import com.nps.booknest.feature.library.data.libraryDataModule
 import com.nps.booknest.feature.library.presentation.libraryPresentationModule
+import com.nps.booknest.feature.profile.presentation.profilePresentationModule
 import com.nps.booknest.feature.reader.data.readerDataModule
 import com.nps.booknest.feature.reader.presentation.readerPresentationModule
 import com.nps.booknest.feature.settings.presentation.settingsPresentationModule
@@ -29,4 +30,5 @@ val appModules =
         readerDataModule,
         readerPresentationModule,
         settingsPresentationModule,
+        profilePresentationModule,
     )

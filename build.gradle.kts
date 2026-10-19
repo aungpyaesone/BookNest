@@ -96,12 +96,17 @@ val allowedProjectDependencies = mapOf(
         ":core:settings",
         ":feature:reader:domain",
     ),
+    ":feature:profile:presentation" to setOf(
+        ":core:design-system",
+        ":core:presentation",
+    ),
     ":feature:settings:presentation" to setOf(
         ":core:design-system",
         ":core:presentation",
         ":core:settings",
     ),
     ":shared" to setOf(
+        ":feature:home:domain",
         ":feature:explore:domain",
         ":core:database",
         ":core:design-system",
@@ -120,6 +125,7 @@ val allowedProjectDependencies = mapOf(
         ":feature:reader:domain",
         ":feature:reader:presentation",
         ":feature:settings:presentation",
+        ":feature:profile:presentation",
     ),
     ":androidApp" to setOf(":shared"),
 )
@@ -236,6 +242,7 @@ tasks.register("verifyBookNest") {
     dependsOn(tasks.check)
     dependsOn(gradle.includedBuild("build-logic").task(":test"))
     dependsOn(":core:domain:testAndroidHostTest")
+    dependsOn(":core:design-system:testAndroidHostTest")
     dependsOn(":core:database:testAndroidHostTest")
     dependsOn(":core:database:assembleAndroidTest")
     dependsOn(":core:settings:testAndroidHostTest")
@@ -253,6 +260,8 @@ tasks.register("verifyBookNest") {
     dependsOn(":feature:reader:data:testAndroidHostTest")
     dependsOn(":feature:reader:presentation:testAndroidHostTest")
     dependsOn(":feature:reader:presentation:assembleAndroidTest")
+    dependsOn(":feature:profile:presentation:testAndroidHostTest")
+    dependsOn(":feature:profile:presentation:assembleAndroidTest")
     dependsOn(":feature:settings:presentation:testAndroidHostTest")
     dependsOn(":feature:settings:presentation:assembleAndroidTest")
     dependsOn(":shared:testAndroidHostTest")

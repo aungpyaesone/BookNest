@@ -10,11 +10,11 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.safeDrawing
+import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.Explore
 import androidx.compose.material.icons.outlined.Home
-import androidx.compose.material.icons.outlined.LocalLibrary
 import androidx.compose.material.icons.outlined.PersonOutline
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
@@ -31,9 +31,16 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.testTag
+import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.rememberTextMeasurer
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import com.nps.booknest.core.designsystem.BookNestSpacing
+import com.nps.booknest.core.designsystem.bookNestAdaptiveTypography
+import com.nps.booknest.core.designsystem.bookNestBookshelfIcon
+import com.nps.booknest.core.designsystem.bookNestIsTablet
 import com.nps.booknest.shared.generated.resources.Res
 import com.nps.booknest.shared.generated.resources.app_nav_explore
 import com.nps.booknest.shared.generated.resources.app_nav_home
@@ -108,6 +115,7 @@ fun BookNestNavigationBar(
     modifier: Modifier = Modifier,
     allowSelectedDestinationClick: Boolean = false,
 ) {
+    val bookNestNavigationTypography = bookNestAdaptiveTypography()
     NavigationBar(
         modifier = modifier.testTag(AppNavigationTestTags.BOTTOM_BAR),
         containerColor = MaterialTheme.colorScheme.surface,
@@ -130,7 +138,7 @@ fun BookNestNavigationBar(
                 label = {
                     Text(
                         text = stringResource(destination.label()),
-                        style = MaterialTheme.typography.labelSmall,
+                        style = bookNestNavigationTypography.labelSmall,
                     )
                 },
             )
@@ -145,8 +153,12 @@ fun BookNestNavigationRail(
     modifier: Modifier = Modifier,
     allowSelectedDestinationClick: Boolean = false,
 ) {
+    val bookNestNavigationTypography = bookNestAdaptiveTypography()
     NavigationRail(
-        modifier = modifier.testTag(AppNavigationTestTags.NAVIGATION_RAIL),
+        modifier =
+            modifier
+                .widthIn(min = navigationRailMinWidth(bookNestNavigationTypography.labelMedium))
+                .testTag(AppNavigationTestTags.NAVIGATION_RAIL),
         containerColor = MaterialTheme.colorScheme.surface,
     ) {
         AppDestination.entries.forEachIndexed { index, destination ->
@@ -170,7 +182,7 @@ fun BookNestNavigationRail(
                 label = {
                     Text(
                         text = stringResource(destination.label()),
-                        style = MaterialTheme.typography.labelMedium,
+                        style = bookNestNavigationTypography.labelMedium,
                     )
                 },
             )
@@ -182,7 +194,7 @@ private fun AppDestination.icon(): ImageVector =
     when (this) {
         AppDestination.HOME -> Icons.Outlined.Home
         AppDestination.EXPLORE -> Icons.Outlined.Explore
-        AppDestination.LIBRARY -> Icons.Outlined.LocalLibrary
+        AppDestination.LIBRARY -> bookNestBookshelfIcon
         AppDestination.PROFILE -> Icons.Outlined.PersonOutline
     }
 
@@ -193,3 +205,14 @@ private fun AppDestination.label(): StringResource =
         AppDestination.LIBRARY -> Res.string.app_nav_library
         AppDestination.PROFILE -> Res.string.app_nav_profile
     }
+
+@Composable
+private fun navigationRailMinWidth(labelStyle: TextStyle): Dp {
+    if (!bookNestIsTablet()) return 80.dp
+    val measurer = rememberTextMeasurer()
+    val labelWidth =
+        AppDestination.entries.maxOf { destination ->
+            measurer.measure(stringResource(destination.label()), style = labelStyle, softWrap = false).size.width
+        }
+    return with(LocalDensity.current) { labelWidth.toDp() }.coerceAtLeast(56.dp) + 24.dp
+}

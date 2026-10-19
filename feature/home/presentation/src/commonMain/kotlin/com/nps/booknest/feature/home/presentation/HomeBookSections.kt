@@ -27,6 +27,7 @@ import com.nps.booknest.core.designsystem.BookNestBookCover
 import com.nps.booknest.core.designsystem.BookNestOutlineButton
 import com.nps.booknest.core.designsystem.BookNestPrimaryButton
 import com.nps.booknest.core.designsystem.BookNestSpacing
+import com.nps.booknest.core.designsystem.bookNestAdaptiveCompactTypography
 import com.nps.booknest.feature.home.presentation.generated.resources.Res
 import com.nps.booknest.feature.home.presentation.generated.resources.home_book_cover_description
 import com.nps.booknest.feature.home.presentation.generated.resources.home_buy
@@ -48,7 +49,7 @@ internal fun PopularBooks(
     columns: Int,
     layoutMode: HomeLayoutMode,
 ) {
-    Column(verticalArrangement = Arrangement.spacedBy(BookNestSpacing.large)) {
+    Column(verticalArrangement = Arrangement.spacedBy(BookNestSpacing.small)) {
         SectionHeader(
             title = stringResource(Res.string.home_popular_books_title),
             action = stringResource(Res.string.home_see_all),
@@ -61,7 +62,7 @@ internal fun PopularBooks(
             }
 
             columns == 1 -> {
-                LazyRow(horizontalArrangement = Arrangement.spacedBy(BookNestSpacing.large)) {
+                LazyRow(horizontalArrangement = Arrangement.spacedBy(BookNestSpacing.small)) {
                     items(state.visibleBooks, key = HomeBookUi::id) { book ->
                         HomeBookCard(
                             book = book,
@@ -92,9 +93,9 @@ private fun BookGrid(
     onAction: (HomeAction) -> Unit,
     layoutMode: HomeLayoutMode,
 ) {
-    Column(verticalArrangement = Arrangement.spacedBy(BookNestSpacing.extraLarge)) {
+    Column(verticalArrangement = Arrangement.spacedBy(BookNestSpacing.medium)) {
         books.chunked(columns).forEach { rowBooks ->
-            Row(horizontalArrangement = Arrangement.spacedBy(BookNestSpacing.extraLarge)) {
+            Row(horizontalArrangement = Arrangement.spacedBy(BookNestSpacing.small)) {
                 rowBooks.forEach { book ->
                     HomeBookCard(
                         book = book,
@@ -118,13 +119,13 @@ private fun HomeBookCard(
 ) {
     val titleStyle =
         if (layoutMode == HomeLayoutMode.COMPACT) {
-            MaterialTheme.typography.titleSmall
+            bookNestAdaptiveCompactTypography().labelMedium
         } else {
-            MaterialTheme.typography.titleMedium
+            bookNestAdaptiveCompactTypography().bodyMedium
         }
     Column(
         modifier = modifier.clickable { onAction(HomeAction.OnBookClick(book.id)) },
-        verticalArrangement = Arrangement.spacedBy(BookNestSpacing.small),
+        verticalArrangement = Arrangement.spacedBy(BookNestSpacing.extraSmall),
     ) {
         BookCover(
             book = book,
@@ -135,22 +136,29 @@ private fun HomeBookCard(
             modifier = Modifier.testTag(HomeTestTags.popularBookTitle(book.id)),
             style = titleStyle,
             fontWeight = FontWeight.SemiBold,
-            maxLines = 1,
+            minLines = 3,
+            maxLines = 3,
             overflow = TextOverflow.Ellipsis,
         )
         Text(
             text = book.author,
             color = MaterialTheme.colorScheme.onSurfaceVariant,
-            style = MaterialTheme.typography.bodySmall,
-            maxLines = 1,
+            style = bookNestAdaptiveCompactTypography().bodySmall,
+            minLines = 2,
+            maxLines = 2,
             overflow = TextOverflow.Ellipsis,
         )
-        if (book.isDemo) Text(stringResource(Res.string.home_demo), style = MaterialTheme.typography.labelSmall)
+        if (book.isDemo) {
+            Text(
+                stringResource(Res.string.home_demo),
+                style = bookNestAdaptiveCompactTypography().labelSmall,
+            )
+        }
         Text(text = book.priceText, style = titleStyle)
         book.rentPriceText?.let { rentalPrice ->
             Text(
                 text = stringResource(Res.string.home_rental_price, rentalPrice, book.rentalDays ?: 0),
-                style = MaterialTheme.typography.bodySmall,
+                style = bookNestAdaptiveCompactTypography().bodySmall,
             )
         }
         Column(

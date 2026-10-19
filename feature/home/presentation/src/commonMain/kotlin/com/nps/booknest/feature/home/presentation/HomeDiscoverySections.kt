@@ -39,6 +39,7 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import com.nps.booknest.core.designsystem.BookNestSize
 import com.nps.booknest.core.designsystem.BookNestSpacing
+import com.nps.booknest.core.designsystem.bookNestAdaptiveCompactTypography
 import com.nps.booknest.core.designsystem.bookNestCategoryIcon
 import com.nps.booknest.core.presentation.asString
 import com.nps.booknest.feature.home.presentation.generated.resources.Res
@@ -113,7 +114,7 @@ internal fun HomeCategories(
     onAction: (HomeAction) -> Unit,
     layoutMode: HomeLayoutMode,
 ) {
-    Column(verticalArrangement = Arrangement.spacedBy(BookNestSpacing.medium)) {
+    Column(verticalArrangement = Arrangement.spacedBy(BookNestSpacing.small)) {
         SectionHeader(
             title = stringResource(Res.string.home_categories_title),
             action = stringResource(Res.string.home_see_all),
@@ -187,7 +188,7 @@ private fun CategoryItem(
         }
         Text(
             text = category.label.asString(),
-            style = MaterialTheme.typography.labelSmall,
+            style = bookNestAdaptiveCompactTypography().labelSmall,
             color = if (isSelected) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onBackground,
             maxLines = 2,
             overflow = TextOverflow.Ellipsis,

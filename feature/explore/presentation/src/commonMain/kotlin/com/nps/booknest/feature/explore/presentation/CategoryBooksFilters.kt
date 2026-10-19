@@ -16,6 +16,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
+import com.nps.booknest.core.designsystem.bookNestAdaptiveCompactTypography
 import com.nps.booknest.feature.explore.domain.CatalogSort
 import com.nps.booknest.feature.explore.presentation.generated.resources.Res
 import com.nps.booknest.feature.explore.presentation.generated.resources.explore_books_count
@@ -40,7 +41,7 @@ internal fun CategoryBookToolbar(
             if (state.hasLoaded) {
                 Text(
                     stringResource(Res.string.explore_books_count, state.total),
-                    style = MaterialTheme.typography.labelMedium,
+                    style = bookNestAdaptiveCompactTypography().labelMedium,
                     modifier = Modifier.testTag("category_books_count"),
                 )
             }
@@ -49,7 +50,7 @@ internal fun CategoryBookToolbar(
             TextButton(onClick = {
                 onAction(CategoryBooksAction.OnSortClick)
             }, modifier = Modifier.testTag("category_sort_action")) {
-                Text(stringResource(sortLabel(state.sort)), style = MaterialTheme.typography.labelSmall)
+                Text(stringResource(sortLabel(state.sort)), style = bookNestAdaptiveCompactTypography().labelSmall)
                 Icon(Icons.Outlined.KeyboardArrowDown, contentDescription = stringResource(Res.string.explore_sort))
             }
             DropdownMenu(

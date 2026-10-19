@@ -48,10 +48,10 @@ private class BookNestChromeScene(
         BookNestAppScaffold(
             selectedDestination = selectedDestination,
             onDestinationSelect = onDestinationSelect,
-            isSettingsVisible = destinationKey == SettingsKey,
+            isSettingsVisible = (destinationKey == SettingsKey || destinationKey == ProfileSettingsKey),
             isReaderVisible = isReaderVisible,
             isNavigationHidden = isNavigationHidden,
-            allowSelectedDestinationClick = destinationKey == SettingsKey,
+            allowSelectedDestinationClick = (destinationKey == SettingsKey || destinationKey == ProfileSettingsKey),
         ) {
             scene.content()
         }

@@ -62,11 +62,11 @@ class HomeViewModel(
 
             is HomeAction.OnCategoryClick -> {
                 if (action.category == homeAllCategory) {
-                    updateFilters { this }
+                    sendEvent(HomeEvent.NavigateToAllBooks)
                 } else if (action.category == homeMoreCategory) {
                     sendEvent(HomeEvent.NavigateToExplore)
                 } else {
-                    showMessage(Res.string.home_message_coming_soon)
+                    action.category.id?.let { sendEvent(HomeEvent.NavigateToCategory(it.toString())) }
                 }
             }
 

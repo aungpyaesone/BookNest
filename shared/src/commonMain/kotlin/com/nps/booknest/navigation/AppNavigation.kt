@@ -23,6 +23,12 @@ data object ExploreKey : AppNavKey
 data object ProfileKey : AppNavKey
 
 @Serializable
+data object EditProfileKey : AppNavKey
+
+@Serializable
+data object ProfileSettingsKey : AppNavKey
+
+@Serializable
 data object SettingsKey : AppNavKey
 
 val appNavigationSerializers =
@@ -30,6 +36,8 @@ val appNavigationSerializers =
         polymorphic(NavKey::class) {
             subclass(ExploreKey::class, ExploreKey.serializer())
             subclass(ProfileKey::class, ProfileKey.serializer())
+            subclass(EditProfileKey::class, EditProfileKey.serializer())
+            subclass(ProfileSettingsKey::class, ProfileSettingsKey.serializer())
             subclass(SettingsKey::class, SettingsKey.serializer())
         }
     }

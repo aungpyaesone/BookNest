@@ -17,13 +17,17 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 
 @Composable
 fun BookNestLogo(
     contentDescription: String,
     modifier: Modifier = Modifier,
+    iconSize: Dp = BookNestSize.logoIcon,
+    textStyle: TextStyle = MaterialTheme.typography.titleLarge,
 ) {
     Row(
         modifier = modifier,
@@ -33,13 +37,13 @@ fun BookNestLogo(
         Icon(
             imageVector = bookNestLogoIcon,
             contentDescription = contentDescription,
-            modifier = Modifier.size(BookNestSize.logoIcon),
+            modifier = Modifier.size(iconSize),
             tint = MaterialTheme.colorScheme.primary,
         )
         Text(
             text = "BookNest",
             color = MaterialTheme.colorScheme.onBackground,
-            style = MaterialTheme.typography.titleLarge,
+            style = textStyle,
             fontWeight = FontWeight.Bold,
         )
     }

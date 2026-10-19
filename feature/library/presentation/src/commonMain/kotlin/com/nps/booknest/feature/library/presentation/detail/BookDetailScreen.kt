@@ -24,6 +24,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.nps.booknest.core.designsystem.BookNestAdaptiveText
 import com.nps.booknest.core.designsystem.BookNestPrimaryButton
 import com.nps.booknest.core.designsystem.BookNestSpacing
 import com.nps.booknest.core.designsystem.BookNestTheme
@@ -81,53 +82,55 @@ fun BookDetailScreen(
     modifier: Modifier = Modifier,
     snackbarHostState: SnackbarHostState = remember { SnackbarHostState() },
 ) {
-    Scaffold(
-        modifier = modifier,
-        snackbarHost = { SnackbarHost(snackbarHostState) },
-    ) { contentPadding ->
-        when {
-            state.isLoading -> {
-                Box(
-                    modifier =
-                        Modifier
-                            .fillMaxSize()
-                            .padding(contentPadding),
-                    contentAlignment = Alignment.Center,
-                ) {
-                    CircularProgressIndicator()
-                }
-            }
-
-            state.book == null -> {
-                Column(
-                    modifier =
-                        Modifier
-                            .fillMaxSize()
-                            .padding(contentPadding)
-                            .padding(BookNestSpacing.section),
-                    horizontalAlignment = Alignment.CenterHorizontally,
-                    verticalArrangement = Arrangement.Center,
-                ) {
-                    Text(
-                        text = stringResource(Res.string.book_detail_missing),
-                        color = MaterialTheme.colorScheme.onSurfaceVariant,
-                        style = MaterialTheme.typography.bodyMedium,
-                    )
-                    TextButton(
-                        onClick = { onAction(BookDetailAction.OnRetryClick) },
-                        modifier = Modifier.padding(top = BookNestSpacing.small),
+    BookNestAdaptiveText {
+        Scaffold(
+            modifier = modifier,
+            snackbarHost = { SnackbarHost(snackbarHostState) },
+        ) { contentPadding ->
+            when {
+                state.isLoading -> {
+                    Box(
+                        modifier =
+                            Modifier
+                                .fillMaxSize()
+                                .padding(contentPadding),
+                        contentAlignment = Alignment.Center,
                     ) {
-                        Text(text = stringResource(Res.string.library_retry))
+                        CircularProgressIndicator()
                     }
                 }
-            }
 
-            else -> {
-                BookDetailContent(
-                    book = state.book,
-                    onAction = onAction,
-                    modifier = Modifier.padding(contentPadding),
-                )
+                state.book == null -> {
+                    Column(
+                        modifier =
+                            Modifier
+                                .fillMaxSize()
+                                .padding(contentPadding)
+                                .padding(BookNestSpacing.section),
+                        horizontalAlignment = Alignment.CenterHorizontally,
+                        verticalArrangement = Arrangement.Center,
+                    ) {
+                        Text(
+                            text = stringResource(Res.string.book_detail_missing),
+                            color = MaterialTheme.colorScheme.onSurfaceVariant,
+                            style = MaterialTheme.typography.bodyMedium,
+                        )
+                        TextButton(
+                            onClick = { onAction(BookDetailAction.OnRetryClick) },
+                            modifier = Modifier.padding(top = BookNestSpacing.small),
+                        ) {
+                            Text(text = stringResource(Res.string.library_retry))
+                        }
+                    }
+                }
+
+                else -> {
+                    BookDetailContent(
+                        book = state.book,
+                        onAction = onAction,
+                        modifier = Modifier.padding(contentPadding),
+                    )
+                }
             }
         }
     }

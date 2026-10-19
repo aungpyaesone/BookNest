@@ -3,6 +3,7 @@
 package com.nps.booknest.navigation
 
 import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.runtime.SideEffect
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalWindowInfo
@@ -28,6 +29,7 @@ import com.nps.booknest.feature.home.presentation.HomeTestTags
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue
 import org.junit.Test
+import kotlin.math.roundToInt
 
 class BookNestSearchConsistencyTest {
     @Test
@@ -49,10 +51,12 @@ class BookNestSearchConsistencyTest {
         val isHome = mutableStateOf(true)
         val home = mutableStateOf(HomeState(isLoading = false))
         val explore = mutableStateOf(ExploreState())
+        var renderedDensity = 1f
         setContent {
             val density =
                 LocalWindowInfo.current.containerSize.width
                     .toFloat() / width
+            SideEffect { renderedDensity = density }
             CompositionLocalProvider(LocalDensity provides Density(density, fontScale)) {
                 BookNestTheme {
                     if (isHome.value) {
@@ -84,11 +88,16 @@ class BookNestSearchConsistencyTest {
         onNodeWithContentDescription("Notifications").assertDoesNotExist()
         val exploreBounds = onNodeWithTag("explore_category_search").getUnclippedBoundsInRoot()
         assertEquals(homeBounds.height.value, exploreBounds.height.value, 1f)
-        assertTrue(exploreBounds.height.value >= 48f)
+        // Match layout's rounding to whole physical pixels, including simulated low-density windows.
+        val minimumHeight = (48f * renderedDensity).roundToInt() / renderedDensity
+        assertTrue("Search height: ${exploreBounds.height}", exploreBounds.height.value >= minimumHeight - 0.01f)
         if (fontScale == 1f) assertEquals(48f, exploreBounds.height.value, 1f)
         assertEquals(homeBounds.width.value, exploreBounds.width.value, 1f)
-        val expectedWidth = minOf(width, 1200) - if (width < 600) 32 else 64
-        assertEquals(expectedWidth.toFloat(), exploreBounds.width.value, 1f)
+        val padding = if (width < 600) 16 else 32
+        val contentPixels = (minOf(width, 1200) * renderedDensity).roundToInt()
+        val paddingPixels = (padding * renderedDensity).roundToInt()
+        val expectedWidth = (contentPixels - 2 * paddingPixels) / renderedDensity
+        assertEquals(expectedWidth, exploreBounds.width.value, 1f)
         onNodeWithTag("explore_category_search").performTextInput("Fiction")
         runOnIdle { assertEquals("Fiction", explore.value.query) }
         onNodeWithTag("explore_category_search").assertIsDisplayed()

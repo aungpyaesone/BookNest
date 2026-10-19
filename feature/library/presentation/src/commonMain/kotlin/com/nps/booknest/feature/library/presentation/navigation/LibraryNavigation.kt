@@ -10,6 +10,21 @@ import kotlinx.serialization.modules.subclass
 sealed interface LibraryNavKey : NavKey
 
 @Serializable
+data object LibraryOverviewKey : LibraryNavKey
+
+@Serializable
+data object ReadingNowKey : LibraryNavKey
+
+@Serializable
+data object CollectionsKey : LibraryNavKey
+
+@Serializable
+data object AllBooksKey : LibraryNavKey
+
+@Serializable
+data object MyBooksKey : LibraryNavKey
+
+@Serializable
 data object LibraryListKey : LibraryNavKey
 
 @Serializable
@@ -20,6 +35,11 @@ data class BookDetailKey(
 val libraryNavigationSerializers =
     SerializersModule {
         polymorphic(NavKey::class) {
+            subclass(LibraryOverviewKey::class, LibraryOverviewKey.serializer())
+            subclass(ReadingNowKey::class, ReadingNowKey.serializer())
+            subclass(CollectionsKey::class, CollectionsKey.serializer())
+            subclass(MyBooksKey::class, MyBooksKey.serializer())
+            subclass(AllBooksKey::class, AllBooksKey.serializer())
             subclass(LibraryListKey::class, LibraryListKey.serializer())
             subclass(BookDetailKey::class, BookDetailKey.serializer())
         }
