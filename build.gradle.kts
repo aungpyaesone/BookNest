@@ -55,14 +55,22 @@ subprojects {
 
 val allowedProjectDependencies = mapOf(
     ":core:domain" to emptySet(),
+    ":core:network" to setOf(":core:domain"),
     ":core:database" to setOf(":core:domain"),
     ":core:presentation" to setOf(":core:domain"),
     ":core:design-system" to emptySet(),
     ":core:settings" to emptySet(),
+    ":feature:home:domain" to setOf(":core:domain"),
+    ":feature:home:data" to setOf(":core:domain", ":core:database", ":core:network", ":feature:home:domain"),
     ":feature:home:presentation" to setOf(
+        ":core:domain",
+        ":feature:home:domain",
         ":core:design-system",
         ":core:presentation",
     ),
+    ":feature:explore:domain" to setOf(":core:domain"),
+    ":feature:explore:data" to setOf(":core:domain", ":core:database", ":core:network", ":feature:explore:domain"),
+    ":feature:explore:presentation" to setOf(":core:domain", ":core:presentation", ":core:design-system", ":feature:explore:domain"),
     ":feature:library:domain" to setOf(":core:domain"),
     ":feature:library:data" to setOf(
         ":core:database",
@@ -94,12 +102,17 @@ val allowedProjectDependencies = mapOf(
         ":core:settings",
     ),
     ":shared" to setOf(
+        ":feature:explore:domain",
         ":core:database",
         ":core:design-system",
         ":core:domain",
         ":core:presentation",
         ":core:settings",
         ":feature:home:presentation",
+        ":feature:explore:presentation",
+        ":feature:explore:data",
+        ":core:network",
+        ":feature:home:data",
         ":feature:library:data",
         ":feature:library:domain",
         ":feature:library:presentation",
@@ -140,6 +153,8 @@ val architectureCheck by tasks.registering {
         )
         listOf(
             project(":core:domain"),
+            project(":feature:home:domain"),
+            project(":feature:explore:domain"),
             project(":feature:library:domain"),
             project(":feature:reader:domain"),
         ).forEach { domainProject ->
@@ -225,8 +240,14 @@ tasks.register("verifyBookNest") {
     dependsOn(":core:database:assembleAndroidTest")
     dependsOn(":core:settings:testAndroidHostTest")
     dependsOn(":feature:library:data:testAndroidHostTest")
+    dependsOn(":feature:home:domain:testAndroidHostTest")
+    dependsOn(":feature:home:data:testAndroidHostTest")
     dependsOn(":feature:home:presentation:testAndroidHostTest")
     dependsOn(":feature:home:presentation:assembleAndroidTest")
+    dependsOn(":feature:explore:presentation:testAndroidHostTest")
+    dependsOn(":feature:explore:data:testAndroidHostTest")
+    dependsOn(":core:network:testAndroidHostTest")
+    dependsOn(":feature:explore:presentation:assembleAndroidTest")
     dependsOn(":feature:library:presentation:testAndroidHostTest")
     dependsOn(":feature:library:presentation:assembleAndroidTest")
     dependsOn(":feature:reader:data:testAndroidHostTest")

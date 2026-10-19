@@ -7,6 +7,7 @@ import androidx.navigation3.scene.SceneDecoratorStrategy
 import androidx.navigation3.scene.SceneDecoratorStrategyScope
 
 internal const val BOOK_NEST_DESTINATION_KEY = "booknest.destination"
+internal const val BOOK_NEST_HIDE_NAVIGATION = "booknest.hide_navigation"
 internal const val BOOK_NEST_READER_SCENE = "booknest.reader"
 
 /** Keeps each scene's viewport and chrome independent throughout push and pop animations. */
@@ -37,12 +38,19 @@ private class BookNestChromeScene(
             ?.metadata
             ?.get(BOOK_NEST_READER_SCENE) == true
 
+    private val isNavigationHidden =
+        scene.entries
+            .lastOrNull()
+            ?.metadata
+            ?.get(BOOK_NEST_HIDE_NAVIGATION) == true
+
     override val content: @Composable () -> Unit = {
         BookNestAppScaffold(
             selectedDestination = selectedDestination,
             onDestinationSelect = onDestinationSelect,
             isSettingsVisible = destinationKey == SettingsKey,
             isReaderVisible = isReaderVisible,
+            isNavigationHidden = isNavigationHidden,
             allowSelectedDestinationClick = destinationKey == SettingsKey,
         ) {
             scene.content()

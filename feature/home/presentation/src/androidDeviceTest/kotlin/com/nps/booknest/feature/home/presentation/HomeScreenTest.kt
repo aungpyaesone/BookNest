@@ -117,7 +117,7 @@ internal class HomeScreenRobot(
 ) {
     fun setContent(
         layoutMode: HomeLayoutMode,
-        state: HomeState = HomeState(),
+        state: HomeState = homePreviewState(),
         width: Dp,
         fontScale: Float = 1f,
         isDarkTheme: Boolean = false,

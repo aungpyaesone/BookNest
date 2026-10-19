@@ -3,7 +3,6 @@
 package com.nps.booknest.feature.home.presentation
 
 import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -19,13 +18,6 @@ import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.foundation.selection.selectable
 import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.outlined.AutoStories
-import androidx.compose.material.icons.outlined.BusinessCenter
-import androidx.compose.material.icons.outlined.GridView
-import androidx.compose.material.icons.outlined.MoreHoriz
-import androidx.compose.material.icons.outlined.School
-import androidx.compose.material.icons.outlined.VolunteerActivism
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
@@ -41,18 +33,17 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.semantics.Role
+import androidx.compose.ui.semantics.contentDescription
+import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import com.nps.booknest.core.designsystem.BookNestSize
 import com.nps.booknest.core.designsystem.BookNestSpacing
+import com.nps.booknest.core.designsystem.bookNestCategoryIcon
+import com.nps.booknest.core.presentation.asString
 import com.nps.booknest.feature.home.presentation.generated.resources.Res
+import com.nps.booknest.feature.home.presentation.generated.resources.home_banner_page_description
 import com.nps.booknest.feature.home.presentation.generated.resources.home_categories_title
-import com.nps.booknest.feature.home.presentation.generated.resources.home_category_all
-import com.nps.booknest.feature.home.presentation.generated.resources.home_category_business
-import com.nps.booknest.feature.home.presentation.generated.resources.home_category_education
-import com.nps.booknest.feature.home.presentation.generated.resources.home_category_fiction
-import com.nps.booknest.feature.home.presentation.generated.resources.home_category_more
-import com.nps.booknest.feature.home.presentation.generated.resources.home_category_self_help
 import com.nps.booknest.feature.home.presentation.generated.resources.home_see_all
 import kotlinx.coroutines.flow.distinctUntilChanged
 import org.jetbrains.compose.resources.stringResource
@@ -63,9 +54,10 @@ internal fun HomeHeroCarousel(
     onAction: (HomeAction) -> Unit,
     layoutMode: HomeLayoutMode,
 ) {
-    val pagerState = rememberPagerState(initialPage = state.currentHeroPage, pageCount = { HERO_PAGE_COUNT })
+    if (state.banners.isEmpty()) return
+    val pagerState = rememberPagerState(initialPage = state.currentHeroPage, pageCount = { state.banners.size })
     val currentOnAction by rememberUpdatedState(onAction)
-    LaunchedEffect(state.currentHeroPage) {
+    LaunchedEffect(state.currentHeroPage, state.banners.size) {
         if (pagerState.currentPage != state.currentHeroPage) pagerState.animateScrollToPage(state.currentHeroPage)
     }
     LaunchedEffect(pagerState) {
@@ -75,27 +67,41 @@ internal fun HomeHeroCarousel(
     }
     Column(horizontalAlignment = Alignment.CenterHorizontally) {
         HorizontalPager(state = pagerState, pageSpacing = BookNestSpacing.small) { page ->
-            HeroCard(page, { onAction(HomeAction.OnExploreClick) }, layoutMode)
+            state.banners.getOrNull(page)?.let { banner ->
+                HeroCard(banner, page, { onAction(HomeAction.OnBannerClick(banner.id)) }, layoutMode)
+            }
         }
         Row(
             modifier = Modifier.padding(top = BookNestSpacing.small),
             horizontalArrangement = Arrangement.spacedBy(BookNestSpacing.small),
         ) {
-            repeat(HERO_PAGE_COUNT) { page ->
+            repeat(state.banners.size) { page ->
                 val isSelected = page == state.currentHeroPage
+                val pageDescription =
+                    stringResource(Res.string.home_banner_page_description, page + 1, state.banners.size)
                 Box(
                     modifier =
                         Modifier
-                            .size(if (isSelected) 8.dp else 6.dp)
-                            .clip(CircleShape)
-                            .background(
-                                if (isSelected) {
-                                    MaterialTheme.colorScheme.primary
-                                } else {
-                                    MaterialTheme.colorScheme.outlineVariant
-                                },
-                            ).clickable { onAction(HomeAction.OnHeroPageChange(page)) },
-                )
+                            .size(BookNestSize.minimumTouchTarget)
+                            .testTag("home_hero_indicator_$page")
+                            .semantics { contentDescription = pageDescription }
+                            .selectable(isSelected, role = Role.Tab) { onAction(HomeAction.OnHeroPageChange(page)) },
+                    contentAlignment = Alignment.Center,
+                ) {
+                    Box(
+                        modifier =
+                            Modifier
+                                .size(if (isSelected) 8.dp else 6.dp)
+                                .clip(CircleShape)
+                                .background(
+                                    if (isSelected) {
+                                        MaterialTheme.colorScheme.primary
+                                    } else {
+                                        MaterialTheme.colorScheme.outlineVariant
+                                    },
+                                ),
+                    )
+                }
             }
         }
     }
@@ -111,33 +117,18 @@ internal fun HomeCategories(
         SectionHeader(
             title = stringResource(Res.string.home_categories_title),
             action = stringResource(Res.string.home_see_all),
-            onActionClick = { onAction(HomeAction.OnCategoryClick(HomeCategory.ALL)) },
+            onActionClick = { onAction(HomeAction.OnCategorySeeAllClick) },
             layoutMode = layoutMode,
         )
-        val categories = HomeCategory.entries
-        if (layoutMode != HomeLayoutMode.COMPACT) {
-            Row(horizontalArrangement = Arrangement.spacedBy(BookNestSpacing.small)) {
-                categories.forEach { category ->
-                    CategoryItem(
-                        category = category,
-                        isSelected = state.selectedCategory == category,
-                        onAction = onAction,
-                        layoutMode = layoutMode,
-                        modifier = Modifier.weight(1f),
-                    )
-                }
-            }
-        } else {
-            LazyRow(horizontalArrangement = Arrangement.spacedBy(BookNestSpacing.small)) {
-                items(categories, key = HomeCategory::name) { category ->
-                    CategoryItem(
-                        category = category,
-                        isSelected = state.selectedCategory == category,
-                        onAction = onAction,
-                        layoutMode = layoutMode,
-                        modifier = Modifier.width(64.dp),
-                    )
-                }
+        LazyRow(horizontalArrangement = Arrangement.spacedBy(BookNestSpacing.small)) {
+            items(state.categories, key = { it.id?.toString() ?: it.iconKey }) { category ->
+                CategoryItem(
+                    category = category,
+                    isSelected = category == homeAllCategory,
+                    onAction = onAction,
+                    layoutMode = layoutMode,
+                    modifier = Modifier.width(if (layoutMode == HomeLayoutMode.COMPACT) 72.dp else 96.dp),
+                )
             }
         }
     }
@@ -145,7 +136,7 @@ internal fun HomeCategories(
 
 @Composable
 private fun CategoryItem(
-    category: HomeCategory,
+    category: HomeCategoryUi,
     isSelected: Boolean,
     onAction: (HomeAction) -> Unit,
     layoutMode: HomeLayoutMode,
@@ -182,7 +173,7 @@ private fun CategoryItem(
         ) {
             Box(contentAlignment = Alignment.Center) {
                 Icon(
-                    imageVector = categoryIcon(category),
+                    imageVector = categoryIcon(category.iconKey),
                     contentDescription = null,
                     tint =
                         if (isSelected) {
@@ -195,7 +186,7 @@ private fun CategoryItem(
             }
         }
         Text(
-            text = categoryLabel(category),
+            text = category.label.asString(),
             style = MaterialTheme.typography.labelSmall,
             color = if (isSelected) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onBackground,
             maxLines = 2,
@@ -204,25 +195,4 @@ private fun CategoryItem(
     }
 }
 
-private fun categoryIcon(category: HomeCategory): ImageVector =
-    when (category) {
-        HomeCategory.ALL -> Icons.Outlined.GridView
-        HomeCategory.FICTION -> Icons.Outlined.AutoStories
-        HomeCategory.EDUCATION -> Icons.Outlined.School
-        HomeCategory.BUSINESS -> Icons.Outlined.BusinessCenter
-        HomeCategory.SELF_HELP -> Icons.Outlined.VolunteerActivism
-        HomeCategory.MORE -> Icons.Outlined.MoreHoriz
-    }
-
-@Composable
-private fun categoryLabel(category: HomeCategory): String =
-    stringResource(
-        when (category) {
-            HomeCategory.ALL -> Res.string.home_category_all
-            HomeCategory.FICTION -> Res.string.home_category_fiction
-            HomeCategory.EDUCATION -> Res.string.home_category_education
-            HomeCategory.BUSINESS -> Res.string.home_category_business
-            HomeCategory.SELF_HELP -> Res.string.home_category_self_help
-            HomeCategory.MORE -> Res.string.home_category_more
-        },
-    )
+private fun categoryIcon(iconKey: String): ImageVector = bookNestCategoryIcon(iconKey)

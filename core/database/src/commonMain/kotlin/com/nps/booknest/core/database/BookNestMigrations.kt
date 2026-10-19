@@ -38,3 +38,22 @@ private fun insertDemoBook(connection: SQLiteConnection) {
             "VALUES ('$DEMO_BOOK_ID', '$DEMO_BOOK_TITLE', '$DEMO_BOOK_AUTHOR')",
     )
 }
+
+object Migration2To3 : Migration(2, 3) {
+    override fun migrate(connection: SQLiteConnection) {
+        connection.execSQL(
+            "CREATE TABLE IF NOT EXISTS home_feeds (feed_id INTEGER NOT NULL, payload TEXT NOT NULL, PRIMARY KEY(feed_id))",
+        )
+    }
+}
+
+object Migration3To4 : Migration(3, 4) {
+    override fun migrate(connection: SQLiteConnection) {
+        connection.execSQL(
+            "CREATE TABLE IF NOT EXISTS explore_taxonomy (feed_id INTEGER NOT NULL, payload TEXT NOT NULL, PRIMARY KEY(feed_id))",
+        )
+        connection.execSQL(
+            "CREATE TABLE IF NOT EXISTS catalog_snapshots (query_key TEXT NOT NULL, payload TEXT NOT NULL, PRIMARY KEY(query_key))",
+        )
+    }
+}

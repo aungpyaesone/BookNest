@@ -3,7 +3,7 @@
     <string name="home_notifications_description">အသိပေးချက်များ</string>
     <string name="home_settings_description">ဆက်တင်များ ဖွင့်မည်</string>
     <string name="home_search_label">စာအုပ်ရှာရန်</string>
-    <string name="home_search_placeholder">စာအုပ်အမည် သို့မဟုတ် စာရေးသူဖြင့် ရှာရန်…</string>
+    <string name="home_search_placeholder">လူကြိုက်များသော စာအုပ်စာရင်းတွင် ရှာရန်</string>
     <string name="home_filter_description">စာအုပ်စစ်ထုတ်ရန်</string>
     <string name="home_hero_title_one">စာအုပ်ကောင်းများ။\nအမှတ်တရကောင်းများ။</string>
     <string name="home_hero_body_one">သင်နှစ်သက်သော စာအုပ်များကို အချိန်မရွေး၊ နေရာမရွေး ဖတ်ရှုနိုင်ပါသည်။</string>
@@ -46,4 +46,17 @@
     <string name="home_filter_close_description">စစ်ထုတ်မှုကို ပိတ်ရန်</string>
     <string name="home_message_coming_soon">ဤလုပ်ဆောင်ချက်ကို လာမည့်အဆင့်တွင် အသုံးပြုနိုင်ပါမည်။</string>
     <string name="home_message_notifications_empty">အသိပေးချက်အသစ် မရှိသေးပါ။</string>
+    <string name="home_loading">စာအုပ်စာရင်း ရယူနေပါသည်…</string>
+    <string name="home_refresh">အသစ်ပြန်ယူမည်</string>
+    <string name="home_retry">ပြန်ကြိုးစားမည်</string>
+    <string name="home_cached_data">နောက်ဆုံးသိမ်းထားသော စာရင်းကို ပြသနေပါသည်။</string>
+    <string name="home_error_network">စာရင်းရယူ၍ မရပါ။ အင်တာနက်ချိတ်ဆက်မှုကို စစ်ပြီး ပြန်ကြိုးစားပါ။</string>
+    <string name="home_error_timeout">ဆာဗာတုံ့ပြန်မှု ကြာနေပါသည်။ ပြန်ကြိုးစားပါ။</string>
+    <string name="home_error_response">စာရင်းအချက်အလက်ကို ဖတ်မရပါ။ ပြန်ကြိုးစားပါ။</string>
+    <string name="home_error_save">စာရင်းကို စက်ထဲ သိမ်းဆည်း၍ မရပါ။ ပြန်ကြိုးစားပါ။</string>
+    <string name="home_message_unavailable">ဤလုပ်ဆောင်ချက်ကို ယခု အသုံးမပြုနိုင်သေးပါ။</string>
+    <string name="home_demo">နမူနာစာအုပ်</string>
+    <string name="home_rental_price">ငှားဈေး %1$s / %2$d ရက်</string>
+    <string name="home_popular_empty">လူကြိုက်များသော စာအုပ် မရှိသေးပါ။</string>
+    <string name="home_banner_page_description">ကြော်ငြာ %1$d / %2$d</string>
 </resources>

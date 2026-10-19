@@ -7,6 +7,11 @@ import androidx.room.RoomDatabaseConstructor
 import androidx.sqlite.driver.bundled.BundledSQLiteDriver
 import com.nps.booknest.core.database.book.BookDao
 import com.nps.booknest.core.database.book.BookEntity
+import com.nps.booknest.core.database.explore.CatalogSnapshotEntity
+import com.nps.booknest.core.database.explore.ExploreCacheDao
+import com.nps.booknest.core.database.explore.ExploreTaxonomyEntity
+import com.nps.booknest.core.database.home.HomeFeedDao
+import com.nps.booknest.core.database.home.HomeFeedEntity
 import com.nps.booknest.core.database.reading.ReadingProgressDao
 import com.nps.booknest.core.database.reading.ReadingProgressEntity
 import kotlinx.coroutines.Dispatchers
@@ -14,9 +19,22 @@ import org.koin.core.module.Module
 
 internal const val BOOKNEST_DATABASE_NAME = "booknest.db"
 
-@Database(entities = [BookEntity::class, ReadingProgressEntity::class], version = 2)
+@Database(
+    entities = [
+        BookEntity::class,
+        ReadingProgressEntity::class,
+        HomeFeedEntity::class,
+        ExploreTaxonomyEntity::class,
+        CatalogSnapshotEntity::class,
+    ],
+    version = 4,
+)
 @ConstructedBy(BookNestDatabaseConstructor::class)
 abstract class BookNestDatabase : RoomDatabase() {
+    abstract fun exploreCacheDao(): ExploreCacheDao
+
+    abstract fun homeFeedDao(): HomeFeedDao
+
     abstract fun bookDao(): BookDao
 
     abstract fun readingProgressDao(): ReadingProgressDao
@@ -30,7 +48,7 @@ expect object BookNestDatabaseConstructor : RoomDatabaseConstructor<BookNestData
 fun createBookNestDatabase(builder: RoomDatabase.Builder<BookNestDatabase>): BookNestDatabase =
     builder
         .addCallback(DemoBookDatabaseCallback)
-        .addMigrations(Migration1To2)
+        .addMigrations(Migration1To2, Migration2To3, Migration3To4)
         .setDriver(BundledSQLiteDriver())
         .setQueryCoroutineContext(Dispatchers.Default)
         .build()

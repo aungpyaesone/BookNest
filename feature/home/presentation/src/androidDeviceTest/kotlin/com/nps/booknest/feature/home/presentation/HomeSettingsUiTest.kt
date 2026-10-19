@@ -40,6 +40,8 @@ class HomeSettingsUiTest {
                 width = 360.dp,
             )
 
+            onNodeWithTag(HomeTestTags.COMPACT_FEED)
+                .performScrollToNode(hasTestTag(HomeTestTags.rentAction("quiet-pages")))
             onNodeWithTag(HomeTestTags.rentAction("quiet-pages"))
                 .assertTextContains("ငှားမည်")
             val titleBounds =
@@ -58,6 +60,8 @@ class HomeSettingsUiTest {
                 width = 360.dp,
             )
 
+            onNodeWithTag(HomeTestTags.COMPACT_FEED)
+                .performScrollToNode(hasTestTag(HomeTestTags.rentAction("quiet-pages")))
             val buyBounds =
                 onNodeWithTag(HomeTestTags.buyAction("quiet-pages"))
                     .getUnclippedBoundsInRoot()

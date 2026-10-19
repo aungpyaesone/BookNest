@@ -32,6 +32,9 @@ kotlin {
         commonMain.dependencies {
             implementation(project(":core:design-system"))
             implementation(project(":core:presentation"))
+            implementation(project(":core:domain"))
+            implementation(project(":feature:home:domain"))
+            implementation(libs.coil.compose)
             implementation(libs.androidx.lifecycle.runtimeCompose)
             implementation(libs.androidx.lifecycle.viewmodelCompose)
             api(libs.androidx.navigation3.ui)

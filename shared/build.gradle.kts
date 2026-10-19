@@ -41,6 +41,13 @@ kotlin {
             implementation(project(":core:design-system"))
             implementation(project(":core:settings"))
             implementation(project(":feature:home:presentation"))
+            implementation(project(":feature:explore:presentation"))
+            implementation(project(":feature:explore:data"))
+            implementation(project(":core:network"))
+            implementation(project(":feature:home:data"))
+            implementation(libs.coil.compose)
+            implementation(libs.coil.svg)
+            implementation(libs.coil.network.ktor)
             implementation(project(":feature:library:data"))
             implementation(project(":feature:library:presentation"))
             implementation(project(":feature:reader:data"))
@@ -76,6 +83,8 @@ kotlin {
             implementation(libs.kotlinx.coroutines.test)
         }
         getByName("androidDeviceTest").dependencies {
+            implementation(project(":feature:explore:domain"))
+            implementation(project(":core:domain"))
             implementation(libs.androidx.test.runner)
             implementation(libs.androidx.testExt.junit)
             implementation(libs.androidx.compose.ui.testManifest)

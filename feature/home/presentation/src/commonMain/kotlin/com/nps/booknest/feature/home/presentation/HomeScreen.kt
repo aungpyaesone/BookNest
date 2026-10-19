@@ -1,9 +1,6 @@
 package com.nps.booknest.feature.home.presentation
 
 import androidx.compose.foundation.background
-import androidx.compose.foundation.border
-import androidx.compose.foundation.interaction.MutableInteractionSource
-import androidx.compose.foundation.interaction.collectIsFocusedAsState
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxWithConstraints
@@ -15,13 +12,10 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.NotificationsNone
-import androidx.compose.material.icons.outlined.Search
 import androidx.compose.material.icons.outlined.Settings
 import androidx.compose.material.icons.outlined.Tune
 import androidx.compose.material3.Icon
@@ -40,15 +34,13 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.platform.testTag
-import androidx.compose.ui.semantics.contentDescription
-import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.nps.booknest.core.designsystem.BookNestLogo
+import com.nps.booknest.core.designsystem.BookNestSearchField
 import com.nps.booknest.core.designsystem.BookNestSize
 import com.nps.booknest.core.designsystem.BookNestSpacing
 import com.nps.booknest.core.designsystem.BookNestTheme
@@ -82,6 +74,10 @@ object HomeTestTags {
     const val READ_NOW_ACTION = "home_read_now_action"
     const val PREMIUM_BANNER = "home_premium_banner"
     const val UPGRADE_ACTION = "home_upgrade_action"
+    const val LOADING = "home_loading"
+    const val REFRESH = "home_refresh"
+    const val FEED_ERROR = "home_feed_error"
+    const val CACHED = "home_cached"
     const val APP_BAR = "home_app_bar"
     const val LOGO = "home_logo"
     const val SEARCH = "home_search"
@@ -188,9 +184,19 @@ private fun CompactHomeFeed(
         verticalArrangement = Arrangement.spacedBy(BookNestSpacing.medium),
     ) {
         item { HomeSearch(state = state, onAction = onAction, layoutMode = HomeLayoutMode.COMPACT) }
-        item { HomeHeroCarousel(state, onAction, HomeLayoutMode.COMPACT) }
-        item { HomeCategories(state, onAction, HomeLayoutMode.COMPACT) }
-        item { PopularBooks(state, onAction, columns = 1, layoutMode = HomeLayoutMode.COMPACT) }
+        item { HomeFeedStatus(state, onAction) }
+        item { if (state.hasLoadedFeed) HomeHeroCarousel(state, onAction, HomeLayoutMode.COMPACT) }
+        item { if (state.hasLoadedFeed) HomeCategories(state, onAction, HomeLayoutMode.COMPACT) }
+        item {
+            if (state.hasLoadedFeed) {
+                PopularBooks(
+                    state,
+                    onAction,
+                    columns = 1,
+                    layoutMode = HomeLayoutMode.COMPACT,
+                )
+            }
+        }
         item { ContinueReadingCard(state.continueReading, onAction, HomeLayoutMode.COMPACT) }
         item {
             PremiumBanner(
@@ -212,8 +218,8 @@ private fun AdaptiveHomeFeed(
         LazyColumn(
             modifier =
                 Modifier
+                    .widthIn(max = BookNestSize.contentMaxWidth)
                     .fillMaxWidth()
-                    .width(BookNestSize.contentMaxWidth)
                     .testTag(HomeTestTags.ADAPTIVE_FEED),
             contentPadding =
                 PaddingValues(
@@ -225,15 +231,18 @@ private fun AdaptiveHomeFeed(
             verticalArrangement = Arrangement.spacedBy(BookNestSpacing.section),
         ) {
             item { HomeSearch(state = state, onAction = onAction, layoutMode = layoutMode) }
-            item { HomeHeroCarousel(state, onAction, layoutMode) }
-            item { HomeCategories(state, onAction, layoutMode) }
+            item { HomeFeedStatus(state, onAction) }
+            item { if (state.hasLoadedFeed) HomeHeroCarousel(state, onAction, layoutMode) }
+            item { if (state.hasLoadedFeed) HomeCategories(state, onAction, layoutMode) }
             item {
-                PopularBooks(
-                    state = state,
-                    onAction = onAction,
-                    columns = if (layoutMode == HomeLayoutMode.EXPANDED) 6 else 3,
-                    layoutMode = layoutMode,
-                )
+                if (state.hasLoadedFeed) {
+                    PopularBooks(
+                        state = state,
+                        onAction = onAction,
+                        columns = if (layoutMode == HomeLayoutMode.EXPANDED) 6 else 3,
+                        layoutMode = layoutMode,
+                    )
+                }
             }
             item {
                 if (layoutMode == HomeLayoutMode.MEDIUM) {
@@ -337,78 +346,22 @@ private fun HomeSearch(
     layoutMode: HomeLayoutMode,
     modifier: Modifier = Modifier,
 ) {
-    val searchLabel = stringResource(Res.string.home_search_label)
-    val interactionSource = remember { MutableInteractionSource() }
-    val isFocused by interactionSource.collectIsFocusedAsState()
-    val shape =
-        if (layoutMode == HomeLayoutMode.COMPACT) {
-            MaterialTheme.shapes.medium
-        } else {
-            MaterialTheme.shapes.large
-        }
-    val textStyle = MaterialTheme.typography.bodySmall.copy(color = MaterialTheme.colorScheme.onSurface)
-    BasicTextField(
-        value = state.searchQuery,
-        onValueChange = { onAction(HomeAction.OnSearchQueryChange(it)) },
-        modifier =
-            modifier
-                .fillMaxWidth()
-                .height(BookNestSize.minimumTouchTarget)
-                .testTag(HomeTestTags.SEARCH)
-                .background(MaterialTheme.colorScheme.surface, shape)
-                .semantics { contentDescription = searchLabel }
-                .border(
-                    width = 1.dp,
-                    color =
-                        if (isFocused) {
-                            MaterialTheme.colorScheme.primary
-                        } else {
-                            MaterialTheme.colorScheme.outlineVariant
-                        },
-                    shape = shape,
-                ),
-        singleLine = true,
-        textStyle = textStyle,
-        cursorBrush = SolidColor(MaterialTheme.colorScheme.primary),
-        interactionSource = interactionSource,
-        decorationBox = { innerTextField ->
-            Row(
-                modifier =
-                    Modifier
-                        .fillMaxSize()
-                        .padding(start = BookNestSpacing.medium),
-                verticalAlignment = Alignment.CenterVertically,
-            ) {
+    BookNestSearchField(
+        query = state.searchQuery,
+        placeholder = stringResource(Res.string.home_search_placeholder),
+        contentDescription = stringResource(Res.string.home_search_label),
+        onQueryChange = { onAction(HomeAction.OnSearchQueryChange(it)) },
+        modifier = modifier.testTag(HomeTestTags.SEARCH),
+        shape = if (layoutMode == HomeLayoutMode.COMPACT) MaterialTheme.shapes.medium else MaterialTheme.shapes.large,
+        trailingContent = {
+            IconButton(onClick = {
+                onAction(HomeAction.OnFilterClick)
+            }, modifier = Modifier.size(BookNestSize.minimumTouchTarget)) {
                 Icon(
-                    imageVector = Icons.Outlined.Search,
-                    contentDescription = null,
+                    Icons.Outlined.Tune,
+                    stringResource(Res.string.home_filter_description),
                     modifier = Modifier.size(18.dp),
-                    tint = MaterialTheme.colorScheme.onSurfaceVariant,
                 )
-                Box(
-                    modifier = Modifier.weight(1f).padding(horizontal = BookNestSpacing.small),
-                    contentAlignment = Alignment.CenterStart,
-                ) {
-                    if (state.searchQuery.isEmpty()) {
-                        Text(
-                            text = stringResource(Res.string.home_search_placeholder),
-                            color = MaterialTheme.colorScheme.onSurfaceVariant,
-                            style = MaterialTheme.typography.bodySmall,
-                            maxLines = 1,
-                        )
-                    }
-                    innerTextField()
-                }
-                IconButton(
-                    onClick = { onAction(HomeAction.OnFilterClick) },
-                    modifier = Modifier.size(BookNestSize.minimumTouchTarget),
-                ) {
-                    Icon(
-                        imageVector = Icons.Outlined.Tune,
-                        contentDescription = stringResource(Res.string.home_filter_description),
-                        modifier = Modifier.size(18.dp),
-                    )
-                }
             }
         },
     )
@@ -418,7 +371,7 @@ private fun HomeSearch(
 @Composable
 private fun HomeScreenPreview() {
     BookNestTheme(isDarkTheme = false) {
-        HomeScreen(state = HomeState(), onAction = {}, layoutMode = HomeLayoutMode.COMPACT)
+        HomeScreen(state = homePreviewState(), onAction = {}, layoutMode = HomeLayoutMode.COMPACT)
     }
 }
 
@@ -426,6 +379,6 @@ private fun HomeScreenPreview() {
 @Composable
 private fun HomeScreenDarkPreview() {
     BookNestTheme(isDarkTheme = true) {
-        HomeScreen(state = HomeState(), onAction = {}, layoutMode = HomeLayoutMode.EXPANDED)
+        HomeScreen(state = homePreviewState(), onAction = {}, layoutMode = HomeLayoutMode.EXPANDED)
     }
 }

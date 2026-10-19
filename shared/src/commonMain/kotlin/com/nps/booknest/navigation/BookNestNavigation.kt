@@ -25,6 +25,10 @@ import androidx.navigation3.runtime.entryProvider
 import androidx.navigation3.runtime.rememberNavBackStack
 import androidx.navigation3.ui.NavDisplay
 import androidx.savedstate.serialization.SavedStateConfiguration
+import com.nps.booknest.feature.explore.presentation.CategoryBooksRoot
+import com.nps.booknest.feature.explore.presentation.ExploreRoot
+import com.nps.booknest.feature.explore.presentation.navigation.CategoryBooksKey
+import com.nps.booknest.feature.explore.presentation.navigation.exploreNavigationSerializers
 import com.nps.booknest.feature.home.presentation.HomeRoot
 import com.nps.booknest.feature.home.presentation.navigation.HomeKey
 import com.nps.booknest.feature.home.presentation.navigation.homeNavigationSerializers
@@ -43,12 +47,19 @@ import kotlinx.serialization.modules.SerializersModule
 internal const val BOOK_NEST_NAVIGATION_ENTER_DURATION_MILLIS = 220
 internal const val BOOK_NEST_NAVIGATION_EXIT_DURATION_MILLIS = 140
 
+internal val categoryBooksSceneMetadata: Map<String, Any> =
+    mapOf(
+        BOOK_NEST_DESTINATION_KEY to ExploreKey,
+        BOOK_NEST_HIDE_NAVIGATION to true,
+    )
+
 private val navigationConfiguration =
     SavedStateConfiguration {
         serializersModule =
             SerializersModule {
                 include(appNavigationSerializers)
                 include(homeNavigationSerializers)
+                include(exploreNavigationSerializers)
                 include(libraryNavigationSerializers)
                 include(readerNavigationSerializers)
             }
@@ -58,8 +69,6 @@ private val navigationConfiguration =
 @Composable
 fun BookNestNavigation(modifier: Modifier = Modifier) {
     val backStack = rememberNavBackStack(navigationConfiguration, HomeKey)
-    val listDetailSceneStrategy = rememberListDetailSceneStrategy<NavKey>()
-    val selectedDestination = backStack.lastOrNull().toAppDestination()
     val chromeStrategy = rememberChromeStrategy(backStack)
 
     Box(
@@ -67,8 +76,8 @@ fun BookNestNavigation(modifier: Modifier = Modifier) {
     ) {
         NavDisplay(
             backStack = backStack,
-            onBack = { backStack.navigateBack(selectedDestination) },
-            sceneStrategies = listOf(listDetailSceneStrategy),
+            onBack = { backStack.navigateBack(backStack.lastOrNull().toAppDestination()) },
+            sceneStrategies = listOf(rememberListDetailSceneStrategy<NavKey>()),
             sceneDecoratorStrategies = listOf(chromeStrategy),
             sizeTransform = null,
             transitionSpec = { bookNestForwardContentTransform() },
@@ -93,7 +102,10 @@ fun BookNestNavigation(modifier: Modifier = Modifier) {
                         )
                     }
                     entry<ExploreKey>(metadata = mapOf(BOOK_NEST_DESTINATION_KEY to ExploreKey)) {
-                        ComingSoonScreen(destination = AppDestination.EXPLORE)
+                        ExploreDestination(backStack)
+                    }
+                    entry<CategoryBooksKey>(metadata = categoryBooksSceneMetadata) { key ->
+                        CategoryBooksDestination(key, backStack)
                     }
                     entry<ProfileKey>(metadata = mapOf(BOOK_NEST_DESTINATION_KEY to ProfileKey)) {
                         ComingSoonScreen(destination = AppDestination.PROFILE)
@@ -134,6 +146,24 @@ fun BookNestNavigation(modifier: Modifier = Modifier) {
                 },
         )
     }
+}
+
+@Composable
+private fun ExploreDestination(backStack: NavBackStack<NavKey>) {
+    ExploreRoot(
+        onNavigateToCategory = { categoryId -> backStack.add(CategoryBooksKey(categoryId)) },
+    )
+}
+
+@Composable
+private fun CategoryBooksDestination(
+    key: CategoryBooksKey,
+    backStack: NavBackStack<NavKey>,
+) {
+    CategoryBooksRoot(
+        categoryId = key.categoryId,
+        onNavigateBack = { backStack.removeLastOrNull() },
+    )
 }
 
 @Composable
@@ -223,7 +253,7 @@ private fun NavKey?.toAppDestination(): AppDestination =
     when (this) {
         HomeKey -> AppDestination.HOME
 
-        ExploreKey -> AppDestination.EXPLORE
+        ExploreKey, is CategoryBooksKey -> AppDestination.EXPLORE
 
         LibraryListKey,
         is BookDetailKey,

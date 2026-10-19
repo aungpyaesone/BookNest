@@ -1,6 +1,5 @@
 package com.nps.booknest.feature.home.presentation
 
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -21,23 +20,18 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
+import coil3.compose.AsyncImage
 import com.nps.booknest.core.designsystem.BookNestPrimaryButton
 import com.nps.booknest.core.designsystem.BookNestSpacing
 import com.nps.booknest.feature.home.presentation.generated.resources.Res
-import com.nps.booknest.feature.home.presentation.generated.resources.home_explore_now
-import com.nps.booknest.feature.home.presentation.generated.resources.home_hero_body_one
-import com.nps.booknest.feature.home.presentation.generated.resources.home_hero_body_three
-import com.nps.booknest.feature.home.presentation.generated.resources.home_hero_body_two
 import com.nps.booknest.feature.home.presentation.generated.resources.home_hero_books
 import com.nps.booknest.feature.home.presentation.generated.resources.home_hero_image_description
-import com.nps.booknest.feature.home.presentation.generated.resources.home_hero_title_one
-import com.nps.booknest.feature.home.presentation.generated.resources.home_hero_title_three
-import com.nps.booknest.feature.home.presentation.generated.resources.home_hero_title_two
 import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.compose.resources.stringResource
 
 @Composable
 internal fun HeroCard(
+    banner: HomeBannerUi,
     page: Int,
     onExploreClick: () -> Unit,
     layoutMode: HomeLayoutMode,
@@ -54,7 +48,7 @@ internal fun HeroCard(
         elevation = CardDefaults.cardElevation(defaultElevation = 1.dp),
     ) {
         HeroCardContent(
-            page = page,
+            banner = banner,
             onExploreClick = onExploreClick,
             layoutMode = layoutMode,
             layout = layout,
@@ -64,21 +58,23 @@ internal fun HeroCard(
 
 @Composable
 private fun HeroCardContent(
-    page: Int,
+    banner: HomeBannerUi,
     onExploreClick: () -> Unit,
     layoutMode: HomeLayoutMode,
     layout: HeroCardLayout,
 ) {
     Row(modifier = Modifier.fillMaxWidth().heightIn(min = layout.minimumHeight)) {
         HeroCopy(
-            page = page,
+            banner = banner,
             onExploreClick = onExploreClick,
             layoutMode = layoutMode,
             layout = layout,
             modifier = Modifier.weight(layout.copyWeight),
         )
-        Image(
-            painter = painterResource(Res.drawable.home_hero_books),
+        AsyncImage(
+            model = banner.imageUrl,
+            placeholder = painterResource(Res.drawable.home_hero_books),
+            error = painterResource(Res.drawable.home_hero_books),
             contentDescription = stringResource(Res.string.home_hero_image_description),
             modifier =
                 Modifier
@@ -93,7 +89,7 @@ private fun HeroCardContent(
 
 @Composable
 private fun HeroCopy(
-    page: Int,
+    banner: HomeBannerUi,
     onExploreClick: () -> Unit,
     layoutMode: HomeLayoutMode,
     layout: HeroCardLayout,
@@ -112,9 +108,9 @@ private fun HeroCopy(
         modifier = modifier.padding(layout.contentPadding),
         verticalArrangement = Arrangement.Center,
     ) {
-        Text(heroTitle(page), style = titleStyle, fontWeight = FontWeight.Bold)
+        Text(banner.title, style = titleStyle, fontWeight = FontWeight.Bold)
         Text(
-            text = heroBody(page),
+            text = banner.subtitle,
             modifier = Modifier.padding(top = BookNestSpacing.medium),
             color = MaterialTheme.colorScheme.onSurfaceVariant,
             style = bodyStyle,
@@ -122,7 +118,7 @@ private fun HeroCopy(
             overflow = TextOverflow.Ellipsis,
         )
         BookNestPrimaryButton(
-            text = stringResource(Res.string.home_explore_now),
+            text = banner.buttonText,
             onClick = onExploreClick,
             modifier =
                 Modifier
@@ -153,23 +149,3 @@ private data class HeroCardLayout(
     val copyWeight: Float,
     val artworkWeight: Float,
 )
-
-@Composable
-private fun heroTitle(page: Int): String =
-    stringResource(
-        when (page) {
-            1 -> Res.string.home_hero_title_two
-            2 -> Res.string.home_hero_title_three
-            else -> Res.string.home_hero_title_one
-        },
-    )
-
-@Composable
-private fun heroBody(page: Int): String =
-    stringResource(
-        when (page) {
-            1 -> Res.string.home_hero_body_two
-            2 -> Res.string.home_hero_body_three
-            else -> Res.string.home_hero_body_one
-        },
-    )

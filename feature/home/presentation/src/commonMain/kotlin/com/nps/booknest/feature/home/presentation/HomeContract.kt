@@ -2,15 +2,9 @@ package com.nps.booknest.feature.home.presentation
 
 import androidx.compose.runtime.Stable
 import com.nps.booknest.core.presentation.UiText
-
-enum class HomeCategory {
-    ALL,
-    FICTION,
-    EDUCATION,
-    BUSINESS,
-    SELF_HELP,
-    MORE,
-}
+import com.nps.booknest.feature.home.presentation.generated.resources.Res
+import com.nps.booknest.feature.home.presentation.generated.resources.home_category_all
+import com.nps.booknest.feature.home.presentation.generated.resources.home_category_more
 
 enum class HomeSortOrder {
     RECOMMENDED,
@@ -18,24 +12,34 @@ enum class HomeSortOrder {
     PRICE_HIGH_TO_LOW,
 }
 
-enum class BookCoverStyle {
-    SAND,
-    FOREST,
-    PLUM,
-    SKY,
-}
+data class HomeBannerUi(
+    val id: String,
+    val title: String,
+    val subtitle: String,
+    val imageUrl: String,
+    val buttonText: String,
+    val action: String,
+)
+
+data class HomeCategoryUi(
+    val id: Long?,
+    val label: UiText,
+    val iconKey: String,
+)
 
 data class HomeBookUi(
     val id: String,
     val title: String,
     val author: String,
-    val priceAmount: Int,
+    val priceAmount: Double,
     val priceText: String,
-    val rentPriceText: String,
-    val category: HomeCategory,
-    val coverStyle: BookCoverStyle,
-    val isRentable: Boolean,
-)
+    val rentPriceText: String?,
+    val coverImageUrl: String,
+    val rentalDays: Int?,
+    val isDemo: Boolean,
+) {
+    val isRentable: Boolean get() = rentPriceText != null
+}
 
 data class ContinueReadingUi(
     val bookId: String,
@@ -45,17 +49,26 @@ data class ContinueReadingUi(
     val progressText: String,
 )
 
+internal val homeAllCategory = HomeCategoryUi(null, UiText.Resource(Res.string.home_category_all), "all")
+internal val homeMoreCategory = HomeCategoryUi(null, UiText.Resource(Res.string.home_category_more), "more")
+
 @Stable
 data class HomeState(
     val searchQuery: String = "",
-    val selectedCategory: HomeCategory = HomeCategory.ALL,
     val selectedSortOrder: HomeSortOrder = HomeSortOrder.RECOMMENDED,
     val isRentalOnly: Boolean = false,
     val isFilterSheetVisible: Boolean = false,
     val currentHeroPage: Int = 0,
-    val books: List<HomeBookUi> = homeBookFixtures,
-    val visibleBooks: List<HomeBookUi> = homeBookFixtures,
+    val banners: List<HomeBannerUi> = emptyList(),
+    val categories: List<HomeCategoryUi> = listOf(homeAllCategory, homeMoreCategory),
+    val books: List<HomeBookUi> = emptyList(),
+    val visibleBooks: List<HomeBookUi> = emptyList(),
     val continueReading: ContinueReadingUi = continueReadingFixture,
+    val isLoading: Boolean = true,
+    val isRefreshing: Boolean = false,
+    val hasLoadedFeed: Boolean = false,
+    val isShowingCachedData: Boolean = false,
+    val error: UiText? = null,
 )
 
 sealed interface HomeAction {
@@ -64,11 +77,15 @@ sealed interface HomeAction {
     ) : HomeAction
 
     data class OnCategoryClick(
-        val category: HomeCategory,
+        val category: HomeCategoryUi,
     ) : HomeAction
 
     data class OnHeroPageChange(
         val page: Int,
+    ) : HomeAction
+
+    data class OnBannerClick(
+        val bannerId: String,
     ) : HomeAction
 
     data class OnSortOrderSelect(
@@ -90,6 +107,10 @@ sealed interface HomeAction {
     data class OnRentClick(
         val bookId: String,
     ) : HomeAction
+
+    data object OnRefreshClick : HomeAction
+
+    data object OnCategorySeeAllClick : HomeAction
 
     data object OnFilterClick : HomeAction
 
@@ -127,56 +148,6 @@ sealed interface HomeEvent {
         val message: UiText,
     ) : HomeEvent
 }
-
-internal const val HERO_PAGE_COUNT = 3
-
-private val homeBookFixtures =
-    listOf(
-        HomeBookUi(
-            id = "quiet-pages",
-            title = "တိတ်ဆိတ်သော စာမျက်နှာများ",
-            author = "မေသဇင်",
-            priceAmount = 12_000,
-            priceText = "၁၂,၀၀၀ ကျပ်",
-            rentPriceText = "ငှားရန် ၃,၀၀၀ ကျပ်",
-            category = HomeCategory.FICTION,
-            coverStyle = BookCoverStyle.SAND,
-            isRentable = true,
-        ),
-        HomeBookUi(
-            id = "mindful-money",
-            title = "ငွေကြေးနှင့် စိတ်ပညာ",
-            author = "လင်းထက်",
-            priceAmount = 10_000,
-            priceText = "၁၀,၀၀၀ ကျပ်",
-            rentPriceText = "ငှားရန် ၂,၅၀၀ ကျပ်",
-            category = HomeCategory.BUSINESS,
-            coverStyle = BookCoverStyle.FOREST,
-            isRentable = true,
-        ),
-        HomeBookUi(
-            id = "brave-thoughts",
-            title = "ရဲရင့်သော အတွေးများ",
-            author = "ခန့်ဇော်",
-            priceAmount = 9_000,
-            priceText = "၉,၀၀၀ ကျပ်",
-            rentPriceText = "ငှားရန် ၂,၀၀၀ ကျပ်",
-            category = HomeCategory.SELF_HELP,
-            coverStyle = BookCoverStyle.PLUM,
-            isRentable = true,
-        ),
-        HomeBookUi(
-            id = "meaningful-days",
-            title = "နေ့ရက်များ၏ အဓိပ္ပာယ်",
-            author = "နန်းယုယု",
-            priceAmount = 8_000,
-            priceText = "၈,၀၀၀ ကျပ်",
-            rentPriceText = "ငှားရန် ၂,၀၀၀ ကျပ်",
-            category = HomeCategory.EDUCATION,
-            coverStyle = BookCoverStyle.SKY,
-            isRentable = false,
-        ),
-    )
 
 private val continueReadingFixture =
     ContinueReadingUi(

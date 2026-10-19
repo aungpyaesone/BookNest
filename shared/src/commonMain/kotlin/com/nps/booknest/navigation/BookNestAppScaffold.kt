@@ -52,6 +52,7 @@ fun BookNestAppScaffold(
     forceExpanded: Boolean? = null,
     isSettingsVisible: Boolean = false,
     isReaderVisible: Boolean = false,
+    isNavigationHidden: Boolean = false,
     allowSelectedDestinationClick: Boolean = false,
     content: @Composable () -> Unit,
 ) {
@@ -69,6 +70,8 @@ fun BookNestAppScaffold(
         val shouldShowBottomNavigation = !(isSettingsVisible && maxHeight > maxWidth)
         if (isReaderVisible) {
             Box(modifier = Modifier.fillMaxSize()) { movableContent() }
+        } else if (isNavigationHidden) {
+            Box(modifier = Modifier.fillMaxSize().windowInsetsPadding(WindowInsets.safeDrawing)) { movableContent() }
         } else if (isExpanded) {
             Row(modifier = Modifier.fillMaxSize().windowInsetsPadding(WindowInsets.safeDrawing)) {
                 BookNestNavigationRail(

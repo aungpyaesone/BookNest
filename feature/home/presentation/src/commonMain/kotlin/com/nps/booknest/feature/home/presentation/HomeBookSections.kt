@@ -1,6 +1,5 @@
 package com.nps.booknest.feature.home.presentation
 
-import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -20,27 +19,25 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Brush
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.platform.testTag
-import androidx.compose.ui.semantics.contentDescription
-import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
+import com.nps.booknest.core.designsystem.BookNestBookCover
 import com.nps.booknest.core.designsystem.BookNestOutlineButton
 import com.nps.booknest.core.designsystem.BookNestPrimaryButton
 import com.nps.booknest.core.designsystem.BookNestSpacing
 import com.nps.booknest.feature.home.presentation.generated.resources.Res
 import com.nps.booknest.feature.home.presentation.generated.resources.home_book_cover_description
 import com.nps.booknest.feature.home.presentation.generated.resources.home_buy
+import com.nps.booknest.feature.home.presentation.generated.resources.home_demo
 import com.nps.booknest.feature.home.presentation.generated.resources.home_no_books_body
 import com.nps.booknest.feature.home.presentation.generated.resources.home_no_books_title
 import com.nps.booknest.feature.home.presentation.generated.resources.home_not_rentable
 import com.nps.booknest.feature.home.presentation.generated.resources.home_popular_books_title
+import com.nps.booknest.feature.home.presentation.generated.resources.home_popular_empty
 import com.nps.booknest.feature.home.presentation.generated.resources.home_rent
+import com.nps.booknest.feature.home.presentation.generated.resources.home_rental_price
 import com.nps.booknest.feature.home.presentation.generated.resources.home_see_all
 import org.jetbrains.compose.resources.stringResource
 
@@ -55,12 +52,12 @@ internal fun PopularBooks(
         SectionHeader(
             title = stringResource(Res.string.home_popular_books_title),
             action = stringResource(Res.string.home_see_all),
-            onActionClick = { onAction(HomeAction.OnCategoryClick(HomeCategory.ALL)) },
+            onActionClick = { onAction(HomeAction.OnExploreClick) },
             layoutMode = layoutMode,
         )
         when {
             state.visibleBooks.isEmpty() -> {
-                EmptyBookResults()
+                EmptyBookResults(isCatalogEmpty = state.books.isEmpty())
             }
 
             columns == 1 -> {
@@ -131,7 +128,6 @@ private fun HomeBookCard(
     ) {
         BookCover(
             book = book,
-            layoutMode = layoutMode,
             modifier = Modifier.fillMaxWidth().aspectRatio(0.7f),
         )
         Text(
@@ -149,7 +145,14 @@ private fun HomeBookCard(
             maxLines = 1,
             overflow = TextOverflow.Ellipsis,
         )
+        if (book.isDemo) Text(stringResource(Res.string.home_demo), style = MaterialTheme.typography.labelSmall)
         Text(text = book.priceText, style = titleStyle)
+        book.rentPriceText?.let { rentalPrice ->
+            Text(
+                text = stringResource(Res.string.home_rental_price, rentalPrice, book.rentalDays ?: 0),
+                style = MaterialTheme.typography.bodySmall,
+            )
+        }
         Column(
             modifier = Modifier.fillMaxWidth(),
             verticalArrangement = Arrangement.spacedBy(BookNestSpacing.extraSmall),
@@ -179,67 +182,18 @@ private fun HomeBookCard(
 @Composable
 private fun BookCover(
     book: HomeBookUi,
-    layoutMode: HomeLayoutMode,
     modifier: Modifier = Modifier,
 ) {
-    val coverDescription = stringResource(Res.string.home_book_cover_description, book.title)
-    Box(
-        modifier =
-            modifier
-                .clip(MaterialTheme.shapes.small)
-                .background(Brush.linearGradient(coverColors(book.coverStyle)))
-                .semantics { contentDescription = coverDescription },
-    ) {
-        Canvas(modifier = Modifier.fillMaxSize()) {
-            drawCircle(color = Color.White.copy(alpha = 0.09f), radius = size.minDimension * 0.45f)
-            drawLine(
-                color = Color.White.copy(alpha = 0.22f),
-                start =
-                    androidx.compose.ui.geometry
-                        .Offset(0f, size.height * 0.76f),
-                end =
-                    androidx.compose.ui.geometry
-                        .Offset(size.width, size.height * 0.54f),
-                strokeWidth = 3.dp.toPx(),
-                cap = StrokeCap.Round,
-            )
-        }
-        Column(
-            modifier = Modifier.fillMaxSize().padding(BookNestSpacing.medium),
-            verticalArrangement = Arrangement.SpaceBetween,
-        ) {
-            Text(
-                text = book.title,
-                color = Color.White,
-                style =
-                    if (layoutMode == HomeLayoutMode.COMPACT) {
-                        MaterialTheme.typography.titleSmall
-                    } else {
-                        MaterialTheme.typography.titleMedium
-                    },
-                fontWeight = FontWeight.Bold,
-                maxLines = 4,
-                overflow = TextOverflow.Ellipsis,
-            )
-            Text(
-                text = book.author,
-                color = Color.White.copy(alpha = 0.85f),
-                style = MaterialTheme.typography.labelSmall,
-            )
-        }
-    }
+    BookNestBookCover(
+        imageUrl = book.coverImageUrl,
+        title = book.title,
+        contentDescription = stringResource(Res.string.home_book_cover_description, book.title),
+        modifier = modifier,
+    )
 }
 
-private fun coverColors(style: BookCoverStyle): List<Color> =
-    when (style) {
-        BookCoverStyle.SAND -> listOf(Color(0xFFC89B6D), Color(0xFF7B4D31))
-        BookCoverStyle.FOREST -> listOf(Color(0xFF365C46), Color(0xFF142E23))
-        BookCoverStyle.PLUM -> listOf(Color(0xFF633365), Color(0xFF241129))
-        BookCoverStyle.SKY -> listOf(Color(0xFF72A7B5), Color(0xFF345C6C))
-    }
-
 @Composable
-private fun EmptyBookResults() {
+private fun EmptyBookResults(isCatalogEmpty: Boolean) {
     Column(
         modifier =
             Modifier
@@ -249,12 +203,20 @@ private fun EmptyBookResults() {
                 .testTag(HomeTestTags.EMPTY_RESULTS),
         horizontalAlignment = Alignment.CenterHorizontally,
     ) {
-        Text(text = stringResource(Res.string.home_no_books_title), style = MaterialTheme.typography.titleMedium)
         Text(
-            text = stringResource(Res.string.home_no_books_body),
-            modifier = Modifier.padding(top = BookNestSpacing.small),
-            color = MaterialTheme.colorScheme.onSurfaceVariant,
-            style = MaterialTheme.typography.bodyMedium,
+            text =
+                stringResource(
+                    if (isCatalogEmpty) Res.string.home_popular_empty else Res.string.home_no_books_title,
+                ),
+            style = MaterialTheme.typography.titleMedium,
         )
+        if (!isCatalogEmpty) {
+            Text(
+                text = stringResource(Res.string.home_no_books_body),
+                modifier = Modifier.padding(top = BookNestSpacing.small),
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                style = MaterialTheme.typography.bodyMedium,
+            )
+        }
     }
 }

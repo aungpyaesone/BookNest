@@ -1,0 +1,28 @@
+<resources>
+    <string name="explore_title">More Categories</string>
+    <string name="explore_back">Back</string>
+    <string name="explore_search_categories">Search categories…</string>
+    <string name="explore_books_count">%1$d Books</string>
+    <string name="explore_sort">Sort</string>
+    <string name="explore_sort_popular">Most Popular</string>
+    <string name="explore_sort_low">Price: Low to High</string>
+    <string name="explore_empty_categories">No categories found</string>
+    <string name="explore_empty_books">No books found</string>
+    <string name="explore_empty_category">Books for this category are coming soon.</string>
+    <string name="explore_coming_soon">Coming soon</string>
+    <string name="explore_hero_description">Explore new worlds, new people, and new perspectives.</string>
+    <string name="explore_category_description">Discover books in this category.</string>
+    <string name="explore_cover_description">Cover of %1$s</string>
+    <string name="explore_no_categories">No categories available</string>
+    <string name="explore_category_unavailable">This category is unavailable.</string>
+    <string name="explore_cached">Showing saved data.</string>
+    <string name="explore_retry">Retry</string>
+    <string name="explore_error_network">Unable to connect. Please try again.</string>
+    <string name="explore_error_timeout">The server took too long to respond. Please retry.</string>
+    <string name="explore_error_response">Unable to read the catalog response.</string>
+    <string name="explore_error_save">Unable to save the catalog on this device.</string>
+    <string name="explore_sort_recent">Recently Added</string>
+    <string name="explore_sort_title">Title A–Z</string>
+    <string name="explore_all">All</string>
+    <string name="explore_demo">Demo</string>
+</resources>
